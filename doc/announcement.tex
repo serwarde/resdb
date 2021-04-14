@@ -1,0 +1,60 @@
+\documentclass[accentcolor=tud9b]{tudexercise}
+
+
+\title{What is a Resilient Database?}
+
+\begin{document}
+% \textit{Success is not final, failure is not fatal; it is the courage to
+%   continue that counts. Winston S. Churchill}
+
+Things fail. But in some domains, failures are not an option. Mission-critical
+applications such as in healthcare, security or financial services often require
+strong tolerance for platform failures. Cloud computing only provides part of
+the answer. In fact, a database running on Amazon Web Services (AWS) can still
+go down for data center outage, resulting in large-scale disruption.
+% The service level agreement guarantees only
+% on paper the so-called ``five-nines'', or $99.999\%$ uptime, but
+% in reality downtime can last significantly longer, such as by the hours.
+% It's also costly. By one estimation for every hour of downtime $98\%$ of the
+% companies lose $\$100,000$.
+
+% There are two main options to increase resilience. The database can replicate
+% asynchronously across multiple availability zones with read-only replicas,
+% though during downtime each replica can only serve reads. For full
+% availability the database needs to synchronize updates to replicas, which adds
+% cost and latency.
+
+% What seems also missing here is the ability to differentiate which data and
+% operation is more ``critical'' than the others.
+
+Is there a demand-driven mechanism to add resilience to a database?
+% Can such a resilient database offer rich semantics for different consistency,
+% availability and performance trade-offs?
+
+To set out for an answer, we start with the classic primary-secondary architecture,
+and turn it on its head.
+The primary database is still hosted at a
+central location. However the secondaries may not be, and so they play the key role
+for disaster recovery.
+During the primary's uptime, the secondaries cache data and balance loads. When the primary
+fails, the secondaries reorganize
+themselves into a peer-to-peer network, while continue processing queries based on
+the cached state.
+% When the primary resumes online, the secondaries bring it
+% up-to-date.
+
+% What sets us apart from the literature is perhaps the disparity in
+% failure and power distribution: we assume the primary runs in a public cloud
+% (e.g. AWS, GCP, Azure), which comes with its own service-level agreement; the
+% secondaries can be cheap and run in a separate network (e.g. private cloud) with
+% varied failure rates.
+
+In this work, we will wrestle with several important pre-existing ideas.
+For example, Paxos~\cite{} may petrify us, the Raft~\cite{} may sink us, Satoshi Nakamoto may
+elude us, Dynamo~\cite{} may electrify us, all the
+while the CAP Theorem~\cite{} will look us in the eyes. But fear not, we shall form a
+quorum~\cite{}, for together we shall prevail.
+\end{document}
+
+
+% multiple availability zones with read-only replicas.  This may not be good enough, because if master goes down, the slaves in other zones can only serve read.  AWS does this for example.  What if I'm a client with Bank of Deutsch and I want to make timely investment at stock market.  Sucks if some outage causes my crucial investment.  Here is a fun solution: we turn the master-slave setup to slave-master setup.  Master runs on AWS, but slaves are more intelligent.  All slaves serve as (1) caching and (2) relay when healthy.  When master goes down, slaves form a consensus network (e.g. based on p2p) to process txns based on cached state.  When master comes back, slaves sync master up.  What about txns for uncached state when master is down?  How much to cache?  These are all tunable parameters.
