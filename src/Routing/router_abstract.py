@@ -4,15 +4,25 @@ from better_abc import ABCMeta, abstract_attribute
 class AbstractRouterClass(metaclass=ABCMeta):
     @abstractmethod
     def add_node(self, node):
+        """
+        adds a new Node into the Router.
+        Also handles node balancing
+        """
         pass
     
     @abstractmethod
     def remove_node(self, node):
+        """
+        adds a new Node into the Router.
+        Also handles node balancing
+        """
         pass
     
     @abstractmethod
     def find_responsible_node(self, key):
-        # returns node id
+        """
+        finds the responsible node, for a given key
+        """
         pass
     
     
