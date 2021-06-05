@@ -22,7 +22,7 @@ class LoadBalancer():
         """
         Return a random_router
         """
-    
+        # TODO: Improve the strategy of choosing a router
         return random.choice(self.get_router_list())
     
     def get_router_list(self):

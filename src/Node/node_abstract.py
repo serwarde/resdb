@@ -27,6 +27,12 @@ class AbstractNodeClass(metaclass=ABCMeta):
         """
         return self._host_name
 
+    def hashFunction(self, key):
+        """
+        Returns the hash value of a given key
+        """
+        pass
+
     @abstractmethod
     def add_object(self, key, value):
         """
@@ -73,6 +79,12 @@ class AbstractNodeClass(metaclass=ABCMeta):
         key = the key from the object
         """
         pass
+
+    def get_objects(self) -> dict:
+        """
+        returns all objects in node
+        """
+        return self._objects_dict
     
     def get_request(self, type, key, value):
         """
