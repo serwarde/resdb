@@ -17,7 +17,7 @@ class RendezvousHashing(AbstractRouterClass):
         champion = None
         maxValue = -1
         for node in self._list_of_nodes:
-            currentValue = node.hashFunction(key)
+            currentValue = node.hash_value_for_key(key)
             if currentValue > maxValue:
                 maxValue = currentValue
                 champion = node
@@ -32,4 +32,4 @@ class RendezvousHashing(AbstractRouterClass):
         temp_list_of_nodes.remove(node)
         #TODO: threading?
         for n in temp_list_of_nodes:
-            n.sendItemToNewNode(node)
+            n.send_item_to_new_node(node)

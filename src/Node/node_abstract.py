@@ -27,7 +27,8 @@ class AbstractNodeClass(metaclass=ABCMeta):
         """
         return self._host_name
 
-    def hashFunction(self, key):
+    @abstractmethod
+    def hash_value_for_key(self, key):
         """
         Returns the hash value of a given key
         """

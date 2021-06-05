@@ -1,11 +1,30 @@
 from Node.node_abstract import AbstractNodeClass
-from typing import Union
+from typing import DefaultDict, Union
+from collections import defaultdict
 
 class RendezvousNode(AbstractNodeClass):
 
-    def sendItemToNewNode(self, node):
+    _node_weight = -1
+    _node_seed = -1
+
+    def __init__(self, name, ip_adress, port, weight):
+        self._host_name = name
+        self._host_ip = ip_adress
+        self._http_port = port
+        self._node_weight = weight
+        # TODO: Check if ip_adress is a adequate seed for the node
+        self._node_seed = ip_adress
+        # TODO: Check if a list is a good representation for values
+        self._objects_dict = defaultdict([])
+
+
+    def hash_value_for_key(self, key):
+        # TODO: Research and implement a hash function
+        return -1
+
+    def send_item_to_new_node(self, node):
         for k,v in self._objects_dict.items():
-            if node.hashFunction(k) >= self.hashFunction(k):
+            if node.hash_value_for_key(k) >= self.hash_value_for_key(k):
                 node.add_object(k,v)
                 # TODO: maybe store hash values of the keys?
 
@@ -45,7 +64,7 @@ class RendezvousNode(AbstractNodeClass):
 
         TODO: Check if necessary if we keep using lists as values in the defaultdict
         """
-        
+
         self._objects_dict[key] = self._objects_dict[key].append(value)
     
     def get_object(self, key) -> Union[int,str,list,bool,tuple,dict]:
