@@ -13,7 +13,7 @@ class AbstractRouterClass(metaclass=ABCMeta):
     @abstractmethod
     def remove_node(self, node):
         """
-        removes a new Node from the Router.
+        removes a Node from the Router.
         Also handles node balancing
         """
         pass
