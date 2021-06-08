@@ -42,7 +42,8 @@ class ConsistentHashing(AbstractRouterClass):
             self.redistribute_objects(node)
 
     def redistribute_objects(self, node):
-       # TODO：think about how to redistribute objects after add or delete the node
+        # TODO：think about how to redistribute objects after add or delete the node
+        pass
 
     def get_node(self, key):
         """
