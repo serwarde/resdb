@@ -50,7 +50,7 @@ class ConsistentHashing(AbstractRouterClass):
 
         If the hash ring is empty, `None` is returned.
         """
-        return self.get_node_pos(key)[0]
+        return self.find_responsible_node(key)[0]
 
     def find_responsible_node(self, key):
         """
