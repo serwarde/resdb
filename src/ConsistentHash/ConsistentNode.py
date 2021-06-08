@@ -12,7 +12,7 @@ class ConsistentNode(AbstractNodeClass):
         # TODO: incomplete
         self._objects_dict = defaultdict([])
 
-    def get_hash(self, key):
+    def hash_value_for_key(self, key):
         # implement a hash function
         m = hashlib.md5()
         m.update(key.encode('utf-8'))
