@@ -1,4 +1,4 @@
-from Consistent.ConsistentNode import ConsistentNode
+from ConsistentHash.ConsistentNode import ConsistentNode
 from Routing.router_abstract import AbstractRouterClass
 import hashlib
 
