@@ -13,7 +13,7 @@ class RendezvousHashing(AbstractRouterClass):
         node: the node that should be added
         """
         self._list_of_nodes.append(node)
-        self.redistribute_objects(node)
+        self.redistribute_objects_to_new_node(node)
 
     def remove_node(self, node):
         """
@@ -23,7 +23,7 @@ class RendezvousHashing(AbstractRouterClass):
         node: the node that should be deleted
         """
         self._list_of_nodes.remove(node)
-        self.redistribute_objects_from_deleted_object(node)
+        self.redistribute_objects_from_deleted_node(node)
 
     def find_responsible_node(self, key) -> RendezvousNode:
         """
@@ -42,7 +42,7 @@ class RendezvousHashing(AbstractRouterClass):
                 champion = node
         return champion
 
-    def redistribute_objects_from_deleted_object(self, node):
+    def redistribute_objects_from_deleted_node(self, node):
         """
         Restributes all Key,Values of a deleted Node
 
@@ -51,7 +51,7 @@ class RendezvousHashing(AbstractRouterClass):
         for k,v in node.get_objects().items():
             self.find_responsible_node(k,v).add_object(k,v)
     
-    def redistribute_objects_to_new_object(self, node):
+    def redistribute_objects_to_new_node(self, node):
         """
         Restributes all Key,Values of a all Nodes, if the new node is the champion
 
