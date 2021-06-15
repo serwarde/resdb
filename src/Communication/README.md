@@ -1,3 +1,33 @@
+# Quick Overview
+
+|                  | gRPC           | Thrift         | RPyX        | XMLRPC |
+|------------------|----------------|----------------|-------------|--------|
+| Getting Started  | x              | -              | x           | x      |
+| Documentation    | x              | -              | x           | x      |
+| Language Support | C++, Python,.. | C++, Python,.. | Python only |  C++, Python,.. |
+| Maintenance      | x              | x              | -           | -      |
+| Streaming        | x              | x              | x           | x      |
+| Can work w/o IDL  | -              | -              | x           | x      |
+
+# gRPC
+
+## Download
+
+>pip install grpcio-tools
+
+## create files based on idl
+>python -m grpc_tools.protoc --python_out=. --grpc_python_out=. --proto_path=. idl.proto
+
+## Pros:
+
+- Multiple Language Support for both servers and clients.
+- It uses HTTP/2 by default for connections.
+- Abundant documentation.
+- This project is actively supported by Google and others.
+## Cons:
+
+- Less flexibility (especially compared to rpyc).
+
 # Apache Thrift 
 
 ## Download 
@@ -22,20 +52,6 @@ and
 - Python doesn’t feel like a primary language for Thrift. Having to add sys.path.append('gen-py') doesn’t make for a smooth python experience.
 - Documentation and online discussions seem relatively scarce compared to gRPC.
 
-# XMLRPC
-
-## Download
-
-nothing
-
-## Pros:
-
-- Easy and straight forward
-
-## Cons:
-
-- didnt look into it
-
 # RPyC
 
 ## download
@@ -52,23 +68,19 @@ nothing
 - Lack of multiple client languages.
 - Lack of formally defined service interface can potentially cause maintenance issues if the codebase becomes large enough.
 
-# gRPC
+# XMLRPC
 
 ## Download
 
->pip install grpcio-tools
-python -m grpc_tools.protoc --python_out=. --grpc_python_out=. --proto_path=. idl.proto
+nothing
 
 ## Pros:
 
-- Multiple Language Support for both servers and clients.
-- It uses HTTP/2 by default for connections.
-- Abundant documentation.
-- This project is actively supported by Google and others.
+- Easy and straight forward
+
 ## Cons:
 
-- Less flexibility (especially compared to rpyc).
-
+- didnt look into it
 
 # xmlrpc vs thrift
 
