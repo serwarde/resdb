@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+service Banking {
+    rpc CreateAccount (CreateRequest) returns (CreateReply) {};
+    rpc Add (AddRequest) returns (AddReply) {};
+    rpc Sub (SubRequest) returns (SubReply) {};
+}
+
+message CreateRequest {
+    string name = 1;
+    int32 money = 2;
+}
+
+message CreateReply {
+    string message = 1;
+}
+
+message AddRequest {
+    string name = 1;
+    int32 money = 2;
+}
+
+message AddReply {
+    string message = 1;
+}
+
+message SubRequest {
+    string name = 1;
+    int32 money = 2;
+}
+
+message SubReply {
+    string message = 1;
+}

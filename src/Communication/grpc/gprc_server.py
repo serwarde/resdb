@@ -3,22 +3,34 @@ from concurrent import futures
 
 import grpc
 
-import src.Communication.grpc.idl_pb2 as idl_pb2
-import src.Communication.grpc.idl_pb2_grpc as idl_pb2_grpc
+import banking_pb2 
+import banking_pb2_grpc
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
-class Rerver(idl_pb2_grpc.TimeServicer):
-    def GetTime(self, request, context):
-        return idl_pb2.TimeReply(message=time.ctime())
-    def Add(self, n1, n2):
-        return n1+n2
+class Rerver(banking_pb2_grpc.BankingServicer):
+    bank_balance = {}
+    def CreateAccount(self, request, context):
+        if request.name in self.bank_balance.keys():
+            return banking_pb2.CreateReply(message="User has already an account")
+        self.bank_balance[request.name] = request.money
+        return banking_pb2.CreateReply(message="Accounted created successfully")
+    
+    def Add(self, request, context):
+        new_balance = self.bank_balance[request.name] + request.money
+        self.bank_balance[request.name] = new_balance
+        return banking_pb2.AddReply(message=f"New Balance is now {new_balance}")
+    
+    def Sub(self, request, context):
+        new_balance = self.bank_balance[request.name] - request.money
+        self.bank_balance[request.name] = new_balance
+        return banking_pb2.SubReply(message=f"New Balance is now {new_balance}")
 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    idl_pb2_grpc.add_TimeServicer_to_server(Rerver(), server)
+    banking_pb2_grpc.add_BankingServicer_to_server(Rerver(), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     try:
