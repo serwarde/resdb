@@ -24,6 +24,11 @@ class BankingStub(object):
                 request_serializer=banking__pb2.AddRequest.SerializeToString,
                 response_deserializer=banking__pb2.AddReply.FromString,
                 )
+        self.AddWOReturn = channel.unary_unary(
+                '/Banking/AddWOReturn',
+                request_serializer=banking__pb2.AddWORequest.SerializeToString,
+                response_deserializer=banking__pb2.AddWOReply.FromString,
+                )
         self.Sub = channel.unary_unary(
                 '/Banking/Sub',
                 request_serializer=banking__pb2.SubRequest.SerializeToString,
@@ -41,6 +46,12 @@ class BankingServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def Add(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddWOReturn(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -64,6 +75,11 @@ def add_BankingServicer_to_server(servicer, server):
                     servicer.Add,
                     request_deserializer=banking__pb2.AddRequest.FromString,
                     response_serializer=banking__pb2.AddReply.SerializeToString,
+            ),
+            'AddWOReturn': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddWOReturn,
+                    request_deserializer=banking__pb2.AddWORequest.FromString,
+                    response_serializer=banking__pb2.AddWOReply.SerializeToString,
             ),
             'Sub': grpc.unary_unary_rpc_method_handler(
                     servicer.Sub,
@@ -111,6 +127,23 @@ class Banking(object):
         return grpc.experimental.unary_unary(request, target, '/Banking/Add',
             banking__pb2.AddRequest.SerializeToString,
             banking__pb2.AddReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AddWOReturn(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Banking/AddWOReturn',
+            banking__pb2.AddWORequest.SerializeToString,
+            banking__pb2.AddWOReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

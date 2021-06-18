@@ -21,6 +21,10 @@ class Rerver(banking_pb2_grpc.BankingServicer):
         new_balance = self.bank_balance[request.name] + request.money
         self.bank_balance[request.name] = new_balance
         return banking_pb2.AddReply(message=f"New Balance is now {new_balance}")
+
+    def AddWOReturn(self, request, context):
+        self.bank_balance[request.name] = self.bank_balance[request.name] + request.money
+        return banking_pb2.AddWOReply()
     
     def Sub(self, request, context):
         new_balance = self.bank_balance[request.name] - request.money

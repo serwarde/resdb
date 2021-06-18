@@ -1,6 +1,5 @@
 FROM python:3.7.3-stretch
 COPY ./grpc /grpc
-COPY ./requirements.txt /grpc/requirements.txt
 WORKDIR "/grpc"
 RUN python -m pip install --upgrade pip
 RUN python -m pip install grpcio
