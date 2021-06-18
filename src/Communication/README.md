@@ -15,8 +15,19 @@
 
 >pip install grpcio-tools
 
-## create files based on idl
->python -m grpc_tools.protoc --python_out=. --grpc_python_out=. --proto_path=. idl.proto
+## Proto Format 
+
+The format is really straight forward:
+if you struggle, you can look at this [guide](https://developers.google.com/protocol-buffers/docs/overview)
+
+## File creation:
+After Creating the idl file (the file with .proto ending), you need to call:
+>python -m grpc_tools.protoc --python_out=. --grpc_python_out=. --proto_path=. file_name.proto
+to create two files which are needed for the server and client
+
+## Start Server in docker:
+
+to start the Server in Docker use the [deploy_container.sh](deploy_container.sh). If you are on windows you can just call each Command seperate. Don't forget to install docker first ;). 
 
 ## Pros:
 
