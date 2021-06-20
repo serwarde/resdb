@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+service ServerInformation {
+    rpc add_ (AddRequest) returns (AddReply) {};
+    rpc get_ (GetRequest) returns (GetReply) {}; 
+    rpc get_random_ (GetRandomRequest) returns (GetRandomReply) {};
+    rpc get_all_ (GetAllRequest) returns (stream GetAllReply) {};
+    rpc delete_ (DeleteRequest) returns (DeleteReply) {}; 
+    rpc delete_all_ (DeleteAllRequest) returns (DeleteAllReply) {};
+
+    //rpc add_node (AddRequest) returns (AddReply) {};
+    //rpc get_node (GetRequest) returns (GetReply) {}; 
+    //rpc get_random_node (GetRandomRequest) returns (GetRandomReply) {};
+    //rpc get_all_nodes (GetAllRequest) returns (GetAllReply) {};
+    //rpc delete_node (DeleteRequest) returns (DeleteReply) {}; 
+    //rpc delete_all_nodes (DeleteAllRequest) returns (DeleteAllReply) {};
+
+    //rpc add_lb (CreateRequest) returns (AddReply) {};
+    //rpc get_lb (GetRequest) returns (GetReply) {}; 
+    //rpc get_random_lb (GetRandomRequest) returns (GetRandomReply) {};
+    //rpc get_all_lb (GetAllRequest) returns (GetAllReply) {};
+    //rpc delete_lb (DeleteRequest) returns (DeleteReply) {}; 
+    //rpc delete_all_lb (DeleteAllRequest) returns (DeleteAllReply) {};
+}
+
+enum RequestType {
+    LOADBALANCER = 0;
+    ROUTER = 1;
+    NODE = 2;
+}
+
+message AddRequest {
+    RequestType type = 1;
+    string name = 2;
+    string ip_address = 3;
+}
+message AddReply {
+    string message = 1;
+}
+
+message GetRequest {
+    RequestType type = 1;
+    string name = 2;
+}
+message GetReply {
+    optional string ip_address = 1;
+    optional string message = 2;
+}
+
+message GetRandomRequest {
+    RequestType type = 1;
+}
+message GetRandomReply {
+    optional string name = 1;
+    optional string ip_address = 2;
+    optional string message = 3;
+}
+
+message GetAllRequest {
+    RequestType type = 1;
+}
+message GetAllReply {
+    string name = 1;
+    string ip_address = 2;
+}
+
+message DeleteRequest {
+    RequestType type = 1;
+    string name = 2;
+}
+message DeleteReply {
+    string message = 1;
+}
+
+message DeleteAllRequest {
+    RequestType type = 1;
+}
+message DeleteAllReply {
+    string message = 1;
+}
