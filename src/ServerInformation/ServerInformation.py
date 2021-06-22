@@ -35,7 +35,14 @@ class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
         return ServerInformation_pb2.GetRandomReply(message="No IP-Addresses are saved")
 
     def get_all_(self, request, context):
-        pass
+        dict = self.get_dict(request.RequestType)
+
+        if dict:
+            for name,ip in dict.items():
+                yield ServerInformation_pb2.GetAllReply(name=name,ip_address=ip)
+        else:
+            return ServerInformation_pb2.GetAllReply(message="Operation was no successfull")
+
 
     def delete_(self, request, context):
         dict = self.get_dict(request.RequestType)
