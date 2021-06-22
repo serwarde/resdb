@@ -1,6 +1,7 @@
 from Node.node_abstract import AbstractNodeClass
 from typing import DefaultDict, Union
 from collections import defaultdict
+import hashlib
 
 class RendezvousNode(AbstractNodeClass):
 
@@ -13,13 +14,20 @@ class RendezvousNode(AbstractNodeClass):
         self._http_port = port
         self._node_weight = weight
         # TODO: Check if ip_adress is a adequate seed for the node
-        self._node_seed = ip_adress
+        self._node_seed = str(ip_adress)+str(name)
         # TODO: Check if a list is a good representation for values
         self._objects_dict = defaultdict([])
 
 
-    def hash_value_for_key(self, key):
+    def hash_value_for_key(self, key) -> int:
+        """
+        returns the hash for a given key. Uses sha256 for creating the hash value. In the
+        hash function the seed is appended to key. The hash is then converted to int and then 
+        multplied by the node weight
+        """
         # TODO: Research and implement a hash function
+        #hash = hashlib.sha256((str(key)+self._node_seed).encode('utf-8')).hexdigest()
+        #return float(hash,16)*self._node_weight
         return -1
 
     def send_item_to_new_node(self, node):
