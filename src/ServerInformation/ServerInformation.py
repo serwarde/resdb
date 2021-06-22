@@ -12,32 +12,32 @@ class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
     node_information = {}
 
     def add_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict and request.name not in dict:
+        if dict is not False and request.name not in dict:
             dict[request.name] = request.ip_address
             return ServerInformation_pb2.AddReply(message="Add was successfull")
         return ServerInformation_pb2.AddReply(message="Add was not successfull")
     
     def get_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict and request.name in dict:
+        if dict is not False and request.name in dict:
             return ServerInformation_pb2.GetReply(ip_address=dict[request.name])
         return ServerInformation_pb2.GetReply(message="No IP-Address for this Name found")
 
     def get_random_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict:
+        if dict is not False:
             item = random.choice(list(dict.items()))
             return ServerInformation_pb2.GetRandomReply(name=item[0],ip_address=item[1])
         return ServerInformation_pb2.GetRandomReply(message="No IP-Addresses are saved")
 
     def get_all_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict:
+        if dict is not False:
             for name,ip in dict.items():
                 yield ServerInformation_pb2.GetAllReply(name=name,ip_address=ip)
         else:
@@ -45,20 +45,20 @@ class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
 
 
     def delete_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict and request.name in dict:
+        if dict is not False and request.name in dict:
             del dict[request.name]
-            return ServerInformation_pb2.AddReply(message="Delete was successfull")
-        return ServerInformation_pb2.AddReply(message="Delete was not successfull")
+            return ServerInformation_pb2.DeleteReply(message="Delete was successfull")
+        return ServerInformation_pb2.DeleteReply(message="Delete was not successfull")
 
     def delete_all_(self, request, context):
-        dict = self.get_dict(request.RequestType)
+        dict = self.get_dict(request.type)
 
-        if dict:
-            dict = {}
-            return ServerInformation_pb2.AddReply(message="Delete was successfull")
-        return ServerInformation_pb2.AddReply(message="Delete was not successfull")
+        if dict is not False:
+            dict.clear()
+            return ServerInformation_pb2.DeleteAllReply(message="Delete was successfull")
+        return ServerInformation_pb2.DeleteAllReply(message="Delete was not successfull")
 
 
     def get_dict(self, RequestType):

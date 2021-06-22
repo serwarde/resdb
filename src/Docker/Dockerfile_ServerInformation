@@ -1,0 +1,9 @@
+FROM python:3.7.3-stretch
+COPY ./src/ServerInformation /grpc
+WORKDIR "/grpc"
+RUN python -m pip install --upgrade pip
+RUN python -m pip install grpcio
+Run python -m pip install google-cloud
+Run python -m pip install google-cloud-vision
+EXPOSE 50052
+CMD ["/bin/bash", "start_server.sh"]
