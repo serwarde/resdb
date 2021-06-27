@@ -1,9 +1,11 @@
 FROM python:3.7.3-stretch
-COPY ./src/ServerInformation /grpc
-WORKDIR "/grpc"
+COPY ./src /resdb/src
+COPY ./src/Rendezvous/renz_start_router.sh /resdb
+WORKDIR "/resdb"
 RUN python -m pip install --upgrade pip
 RUN python -m pip install grpcio
 Run python -m pip install google-cloud
 Run python -m pip install google-cloud-vision
-EXPOSE 50050
-CMD ["/bin/bash", "start_server.sh"]
+Run python -m pip install better-abc
+EXPOSE 50150
+CMD ["/bin/bash", "renz_start_router.sh"]
