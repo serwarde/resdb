@@ -1,8 +1,8 @@
 import grpc
 import time
 
-import ServerInformation_pb2 as SI_pb2
-import ServerInformation_pb2_grpc as SI_pb2_grpc
+import src.ServerInformation.ServerInformation_pb2 as SI_pb2
+import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
 
 
 def test_add(stub):
@@ -167,26 +167,26 @@ def test_delete(stub):
 
 def test_delete_all(stub):
     # Delete all entries from the dicts
-    request = SI_pb2.DeleteRequest(type=SI_pb2.LOADBALANCER)
+    request = SI_pb2.DeleteAllRequest(type=SI_pb2.LOADBALANCER)
     response = stub.delete_all_(request)
     assert response.message == "Delete was successfull"
     
-    request = SI_pb2.DeleteRequest(type=SI_pb2.ROUTER)
+    request = SI_pb2.DeleteAllRequest(type=SI_pb2.ROUTER)
     response = stub.delete_all_(request)
     assert response.message == "Delete was successfull"
     
-    request = SI_pb2.DeleteRequest(type=SI_pb2.NODE)
+    request = SI_pb2.DeleteAllRequest(type=SI_pb2.NODE)
     response = stub.delete_all_(request)
     assert response.message == "Delete was successfull"
 
     # try to delete all from an none existing server type
-    request = SI_pb2.DeleteRequest(type=-1)
+    request = SI_pb2.DeleteAllRequest(type=-1)
     response = stub.delete_all_(request)
     assert response.message == "Delete was not successfull"
 
 
 if __name__ == '__main__':
-    channel = grpc.insecure_channel('localhost:50052')
+    channel = grpc.insecure_channel('localhost:50050')
     stub = SI_pb2_grpc.ServerInformationStub(channel)
 
     test_delete_all(stub)
