@@ -3,8 +3,8 @@ from concurrent import futures
 import random
 import grpc
 
-import ServerInformation_pb2
-import ServerInformation_pb2_grpc
+import src.ServerInformation.ServerInformation_pb2 as ServerInformation_pb2
+import src.ServerInformation.ServerInformation_pb2_grpc as ServerInformation_pb2_grpc
 
 class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
     lb_information = {}
@@ -74,7 +74,7 @@ class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     ServerInformation_pb2_grpc.add_ServerInformationServicer_to_server(ServerInformation(), server)
-    server.add_insecure_port('0.0.0.0:50052')
+    server.add_insecure_port('0.0.0.0:50050')
     server.start()
     try:
         server.wait_for_termination()

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import ServerInformation_pb2 as ServerInformation__pb2
+import src.ServerInformation.ServerInformation_pb2 as ServerInformation__pb2
 
 
 class ServerInformationStub(object):

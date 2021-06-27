@@ -7,20 +7,6 @@ service ServerInformation {
     rpc get_all_ (GetAllRequest) returns (stream GetAllReply) {};
     rpc delete_ (DeleteRequest) returns (DeleteReply) {}; 
     rpc delete_all_ (DeleteAllRequest) returns (DeleteAllReply) {};
-
-    //rpc add_node (AddRequest) returns (AddReply) {};
-    //rpc get_node (GetRequest) returns (GetReply) {}; 
-    //rpc get_random_node (GetRandomRequest) returns (GetRandomReply) {};
-    //rpc get_all_nodes (GetAllRequest) returns (GetAllReply) {};
-    //rpc delete_node (DeleteRequest) returns (DeleteReply) {}; 
-    //rpc delete_all_nodes (DeleteAllRequest) returns (DeleteAllReply) {};
-
-    //rpc add_lb (CreateRequest) returns (AddReply) {};
-    //rpc get_lb (GetRequest) returns (GetReply) {}; 
-    //rpc get_random_lb (GetRandomRequest) returns (GetRandomReply) {};
-    //rpc get_all_lb (GetAllRequest) returns (GetAllReply) {};
-    //rpc delete_lb (DeleteRequest) returns (DeleteReply) {}; 
-    //rpc delete_all_lb (DeleteAllRequest) returns (DeleteAllReply) {};
 }
 
 enum RequestType {
