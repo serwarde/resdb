@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+service RendezvousNode {
+    rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
+    rpc get_request (NodeGetRequest) returns (NodeGetReply) {};
+    
+}
+
+message NodeGetRequest {
+    string type = 1;
+    string key = 2;
+    string value = 3;
+}
+message NodeGetReply {
+}
+
+message NodeHashValueForRequest {
+    string key = 1;
+
+}
+message NodeHashValueForReply {
+    string hashValue = 1;
+}
