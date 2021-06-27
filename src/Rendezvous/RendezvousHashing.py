@@ -79,6 +79,7 @@ class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
         # return chamions ip 
         return RH_pb2_grpc.RendezvousFindNodeReply(name=champion_name,ip_address=champion_ip)
 
+    # TODO: can we call the find_responsible_node function if we dont use rpc?
     def redistribute_objects_from_deleted_node(self, node):
         """
         Restributes all Key,Values of a deleted Node
