@@ -1,7 +1,7 @@
 import hashlib
 class ConsistentHashing():
 
-    def __init__(self, nodes=None, virtual_copies=10):
+    def __init__(self, nodes=None, virtual_copies=1):
         """
         initialize
         """
@@ -14,6 +14,9 @@ class ConsistentHashing():
                 self.init_ring(node)
 
     def init_ring(self, node):
+        """
+        Initialize the hash ring
+        """
         for i in range(self.virtual_copies):
             virtual_node = f"{node._host_name}#{i}"
             hashcode = self.get_hash(virtual_node)
@@ -48,7 +51,7 @@ class ConsistentHashing():
         """Find the corresponding key of the object, whose hashvalue is in the related range,
            put it into the new node.
         """
-        # TODO：think about how to redistribute objects after add or delete the node
+        # TODO：think about how to redistribute objects when considering virtual nodes
         hashcode = self.get_hash(node._host_name + '#' + str(0))
         position = self._sorted_hashcode.index(hashcode)
 
@@ -76,6 +79,7 @@ class ConsistentHashing():
         """Find all objects stored on the current node,
            put them into the next node.
         """
+        # TODO：think about how to redistribute objects when considering virtual nodes
         hashcode = self.get_hash(node._host_name + '#' + str(0))
         position = self._sorted_hashcode.index(hashcode)
         # prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
