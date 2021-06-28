@@ -1,49 +1,107 @@
-from ConsistentHash.ConsistentNode import ConsistentNode
-from Routing.router_abstract import AbstractRouterClass
 import hashlib
+class ConsistentHashing():
 
-
-class ConsistentHashing(AbstractRouterClass):
-
-    def __init__(self, nodes=None, virtual_copies= 10):
+    def __init__(self, nodes=None, virtual_copies=10):
         """
         initialize
         """
         self.virtual_copies = virtual_copies
         self.ring = dict()
-        self._sorted_keys = []
+        self._sorted_hashcode = []
 
         if nodes:
             for node in nodes:
-                self.add_node(node)
+                self.init_ring(node)
+
+    def init_ring(self, node):
+        for i in range(self.virtual_copies):
+            virtual_node = f"{node._host_name}#{i}"
+            hashcode = self.get_hash(virtual_node)
+            self.ring[hashcode] = node
+            self._sorted_hashcode.append(hashcode)
+        self._sorted_hashcode.sort()
 
     def add_node(self, node):
         """
         Add a new node and its virtual nodes into the hash ring
         """
         for i in range(self.virtual_copies):
-            virtual_node = f"{node}#{i}"
-            key = self.get_hash(virtual_node)
-            self.ring[key] = node
-            self._sorted_keys.append(key)
+            virtual_node = f"{node._host_name}#{i}"
+            hashcode = self.get_hash(virtual_node)
+            self.ring[hashcode] = node
+            self._sorted_hashcode.append(hashcode)
 
-        self._sorted_keys.sort()
-        self.redistribute_objects(node)
-
+        self._sorted_hashcode.sort()
+        self.redistribute_objects_for_add(node)
 
     def remove_node(self, node):
         """
         Remove node and its virtual_copies from the hash ring 
         """
         for i in range(self.virtual_copies):
-            key = self.get_hash(f"{node}#{i}")
-            del self.ring[key]
-            self._sorted_keys.remove(key)
-            self.redistribute_objects(node)
+            hashcode = self.get_hash(f"{node._host_name}#{i}")
+            del self.ring[hashcode]
+            # self.redistribute_objects_for_remove(node)
+            self._sorted_hashcode.remove(hashcode)
 
-    def redistribute_objects(self, node):
+    def redistribute_objects_for_add(self, node):
+        """Find the corresponding key of the object, whose hashvalue is in the related range,
+           put it into the new node.
+        """
         # TODO：think about how to redistribute objects after add or delete the node
-        pass
+        hashcode = self.get_hash(node._host_name + '#' + str(0))
+        position = self._sorted_hashcode.index(hashcode)
+
+        if position == 0:
+            prev_neighbor_hashcode = self._sorted_hashcode[-1]
+            next_neighbor_hashcode = self._sorted_hashcode[position + 1]
+            next_neighbor_node = self.ring[next_neighbor_hashcode]
+
+        elif position == len(self._sorted_hashcode) - 1:
+            prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
+            next_neighbor_hashcode = self._sorted_hashcode[0]
+            next_neighbor_node = self.ring[next_neighbor_hashcode]
+        else:
+            prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
+            next_neighbor_hashcode = self._sorted_hashcode[position + 1]
+            next_neighbor_node = self.ring[next_neighbor_hashcode]
+
+        #         all_object = next_neighbor_node._objects_dict
+        for k, v in next_neighbor_node._objects_dict.items():
+            if k > prev_neighbor_hashcode and k < hashcode:
+                node.add_object(k, v)
+                next_neighbor_node.remove_object(k, v)
+
+    def redistribute_objects_for_remove(self, node):
+        """Find all objects stored on the current node,
+           put them into the next node.
+        """
+        hashcode = self.get_hash(node._host_name + '#' + str(0))
+        position = self._sorted_hashcode.index(hashcode)
+        # prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
+        print(node._host_name, position)
+        if position == len(self._sorted_hashcode) - 1:
+            next_neighbor_hashcode = self._sorted_hashcode[0]
+            next_neighbor_node = self.ring[next_neighbor_hashcode]
+        else:
+            next_neighbor_hashcode = self._sorted_hashcode[position + 1]
+            next_neighbor_node = self.ring[next_neighbor_hashcode]
+
+        #         all_object = node._objects_dict
+        for k, v in node._objects_dict.items():
+            next_neighbor_node.add_object(k, v)
+
+        # all_object = node._objects_dict
+        # # remove_node(node)
+        for i in range(self.virtual_copies):
+            hashcode = self.get_hash(f"{node._host_name}#{i}")
+            del self.ring[hashcode]
+            # self.redistribute_objects_for_remove(node)
+            self._sorted_hashcode.remove(hashcode)
+
+    #         for k,v in node._objects_dict.items():
+    #             responsible_node, _ = find_responsible_node(k)
+    #             responsible_node.add_object(k,v)
 
     def get_node(self, key):
         """
@@ -63,12 +121,13 @@ class ConsistentHashing(AbstractRouterClass):
         if not self.ring:
             return None, None
 
-        key = self.get_hash(key)
-        nodes = self._sorted_keys
+        hashcode = self.get_hash(key)
+        nodes = self._sorted_hashcode
         for i in range(len(nodes)):
             node = nodes[i]
-            if key < node:
+            if node > hashcode:
                 return self.ring[node], i
+                break
 
         return self.ring[nodes[0]], 0
 

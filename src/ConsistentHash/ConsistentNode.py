@@ -1,16 +1,17 @@
-from Node.node_abstract import AbstractNodeClass
+# from Node.node_abstract import AbstractNodeClass
 from typing import DefaultDict, Union
 from collections import defaultdict
 import hashlib
 
-class ConsistentNode(AbstractNodeClass):
 
-    def __init__(self, name, ip_adress, port):
+class ConsistentNode():
+
+    def __init__(self, name='111', ip_adress='222', port='333'):
         self._host_name = name
         self._host_ip = ip_adress
         self._http_port = port
         # TODO: incomplete
-        self._objects_dict = defaultdict([])
+        self._objects_dict = defaultdict(lambda: [])
 
     def hash_value_for_key(self, key):
         # implement a hash function
@@ -24,8 +25,9 @@ class ConsistentNode(AbstractNodeClass):
         key = the key for the object
         value = value of the key
         """
+        # self._objects_dict[key] = self._objects_dict[key].append(value)
 
-        self._objects_dict[key] = self._objects_dict[key].append(value)
+        self._objects_dict[key] = value
 
     def remove_object(self, key, value=None):
         """
@@ -37,10 +39,11 @@ class ConsistentNode(AbstractNodeClass):
         """
         if key in self._objects_dict:
             if value:
-                self._objects_dict[key] = self._objects_dict[key].remove(value)
-            else:
+                #                 self._objects_dict[key] = self._objects_dict[key].remove(value)
                 del self._objects_dict[key]
 
+            else:
+                del self._objects_dict[key]
 
     def get_object(self, key) -> Union[int, str, list, bool, tuple, dict]:
         """
@@ -48,3 +51,6 @@ class ConsistentNode(AbstractNodeClass):
         key = the key for the object
         """
         return self._objects_dict[key]
+
+    def get_all_object(self):
+        return self._objects_dict
