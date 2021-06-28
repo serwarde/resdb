@@ -53,4 +53,7 @@ class ConsistentNode():
         return self._objects_dict[key]
 
     def get_all_object(self):
+        """
+        return all objects that stored in the node
+        """
         return self._objects_dict
