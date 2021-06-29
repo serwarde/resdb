@@ -14,17 +14,29 @@ import grpc
 import socket
 from concurrent import futures
 
-# TODO: look how to import from AbstractRouterClass since it is our abstract class. Maybe like this: RendezvousHashing(AbstractRouterClass(RH_pb2_grpc.RendezvousHashingServicer))
-class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
-    ## TODO: Locking this attribute to ensure sync
-    _list_of_nodes = []
-
+# look how to import from AbstractRouterClass since it is our abstract class. Maybe like this: RendezvousHashing(AbstractRouterClass(RH_pb2_grpc.RendezvousHashingServicer))
+# DONE: inheriting from two classes at the same time could be done by separating them with a comma
+class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServicer):
     def __init__(self) -> None:
-        channel = grpc.insecure_channel('172.17.0.2:50050')
+        channel = grpc.insecure_channel("172.17.0.2:50050")
         self.server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
+        ## TODO: Locking this attribute to ensure sync
+        self._list_of_nodes = {}
+        self.get_all_nodes()
 
-    # TODO: add_node, remove_node are currently not working. they need to be callable by grpc. And also should update the ServerInformation
-    # TODO: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
+    # DONE: save the nodes locally
+    def get_all_nodes(self):
+        """
+        Updated the list of all available nodes from the ServerInformation
+        """
+        request = SI_pb2.GetAllRequest(type=SI_pb2.NODE)
+        responses = self.server_information_stub.get_all_(request)
+        for i, response in enumerate(responses):
+            self._list_of_nodes[response.ip_address] = response.name
+
+    # TODO: update the ServerInformation
+    # Done: add_node, remove_node are currently not working. they need to be callable by grpc.
+    # Done: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
     def add_node(self, node):
         """
         adds a new Node into the Router.
@@ -32,8 +44,8 @@ class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
 
         node: the node that should be added
         """
-        self._list_of_nodes.append(node)
-        self.redistribute_objects_to_new_node(node)
+        self._list_of_nodes[node.ip_address] = node.name
+        self.redistribute_objects_to_new_node(node.ip_address, node.name)
 
     def remove_node(self, node):
         """
@@ -42,9 +54,46 @@ class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
 
         node: the node that should be deleted
         """
-        self._list_of_nodes.remove(node)
-        self.redistribute_objects_from_deleted_node(node)        
+        del self._list_of_nodes[node.ip_address]
+        self.redistribute_objects_from_deleted_node(node.ip_address, node.name)
 
+    def redistribute_objects_to_new_node(self, ip_address, name):
+        """
+        Redistributes all Key,Values of a all Nodes, if the new node is the champion
+
+        node: the node that will be added
+        """
+        temp_list_of_nodes = self._list_of_node
+        del temp_list_of_nodes[ip_address]
+
+        # TODO: threading?
+        for n_ip, n_name in temp_list_of_nodes.items():
+            channel = grpc.insecure_channel(n_ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+            node_stub.send_item_to_new_node(ip_address, name)
+
+    # DONE: can we call the find_responsible_node function if we dont use rpc?
+    def redistribute_objects_from_deleted_node(self, ip_address, name):
+        """
+        Redistributes all Key,Values of a deleted Node
+
+        node: the node that should be deleted
+        """
+        objects_on_node = {}
+        channel = grpc.insecure_channel(node[0])
+        node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+        responses = node_stub.get_objects()
+
+        # reconstruct the dictionary of objects saved on the node
+        for i, response in enumerate(responses):
+            objects_on_node[response.key] = response.value
+
+        # TODO: This solution is probably not efficient, but I'm not sure whether it's a design or programming issue. 
+        for k, v in objects_on_node.items():
+            self.find_responsible_node(k, v)
+
+
+    # DONE: the request gets forwarded directly from the router after finding the responsible node
     def find_responsible_node(self, request, context):
         """
         finds the responsible node, for a given key
@@ -57,13 +106,11 @@ class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
         champion_name = None
         maxValue = -1
 
-        # TODO: save nodes locally
-        responses = self.server_information_stub.get_all_(SI_pb2.GetAllRequest(type=SI_pb2.NODE))
-
         # TODO: threading
-        for node in responses:
+        for node in self._list_of_nodes:
+            # note: a node tuple consists of an ip_address and name
             # connect to the node
-            channel = grpc.insecure_channel(node.ip_address)
+            channel = grpc.insecure_channel(node[0])
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             # calc the hash score from the node
@@ -73,51 +120,38 @@ class RendezvousHashing(RH_pb2_grpc.RendezvousHashingServicer):
             # check if node is the biggest
             if currentValue.hashValue > maxValue:
                 maxValue = currentValue.hashValue
-                champion_ip = node.ip_address
-                champion_name = node.name
-        
-        # return chamions ip 
-        return RH_pb2_grpc.RendezvousFindNodeReply(name=champion_name,ip_address=champion_ip)
+                champion_ip = node[0]
+                champion_name = node[1]
 
-    # TODO: can we call the find_responsible_node function if we dont use rpc?
-    def redistribute_objects_from_deleted_node(self, node):
-        """
-        Restributes all Key,Values of a deleted Node
+        # creates a connection to the node
+        channel = grpc.insecure_channel(champion_ip)
+        node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-        node: the node that should be deleted
-        """
-        for k,v in node.get_objects().items():
-            self.find_responsible_node(k,v).add_object(k,v)
-    
-    def redistribute_objects_to_new_node(self, node):
-        """
-        Restributes all Key,Values of a all Nodes, if the new node is the champion
+        # sends a the request to the node
+        request = RN_pb2.NodeGetRequest(type, request.key, request.value)
+        node_stub.get_request(request)
 
-        node: the node that will be added
-        """
-        temp_list_of_nodes = self._list_of_node
-        temp_list_of_nodes.remove(node)
-        #TODO: threading?
-        for n in temp_list_of_nodes:
-            n.send_item_to_new_node(node)
 
-def serve(name,ip_address,port):
-    channel = grpc.insecure_channel('172.17.0.2:50050')
+def serve(name, ip_address, port):
+    channel = grpc.insecure_channel("172.17.0.2:50050")
     server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
 
-    request = SI_pb2.AddRequest(type=SI_pb2.ROUTER,name=name,ip_address=f'{ip_address}:{port}')
+    request = SI_pb2.AddRequest(
+        type=SI_pb2.ROUTER, name=name, ip_address=f"{ip_address}:{port}"
+    )
     _ = server_information_stub.add_(request)
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RH_pb2_grpc.add_RendezvousHashingServicer_to_server(RendezvousHashing(), server)
-    server.add_insecure_port(f'{ip_address}:{port}')
+    server.add_insecure_port(f"{ip_address}:{port}")
     server.start()
     try:
         server.wait_for_termination()
     except KeyboardInterrupt:
         server.stop(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     name = "Router1"
     port = 50150
     hostname = socket.gethostname()
