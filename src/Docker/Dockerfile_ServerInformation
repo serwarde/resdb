@@ -1,6 +1,7 @@
 FROM python:3.7.3-stretch
-COPY ./src/ServerInformation /grpc
-WORKDIR "/grpc"
+COPY ./src /resdb/src
+COPY ./src/ServerInformation/start_router.sh /resdb
+WORKDIR "/resdb"
 RUN python -m pip install --upgrade pip
 RUN python -m pip install grpcio
 Run python -m pip install google-cloud
