@@ -17,7 +17,17 @@ class RendezvousHashingStub(object):
         self.find_responsible_node = channel.unary_unary(
                 '/RendezvousHashing/find_responsible_node',
                 request_serializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-                response_deserializer=RendezvousHashing__pb2.RendezvousFindNodeReply.FromString,
+                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
+                )
+        self.add_node = channel.unary_unary(
+                '/RendezvousHashing/add_node',
+                request_serializer=RendezvousHashing__pb2.NodeInformation.SerializeToString,
+                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
+                )
+        self.remove_node = channel.unary_unary(
+                '/RendezvousHashing/remove_node',
+                request_serializer=RendezvousHashing__pb2.NodeInformation.SerializeToString,
+                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
                 )
 
 
@@ -30,13 +40,35 @@ class RendezvousHashingServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def add_node(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def remove_node(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RendezvousHashingServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'find_responsible_node': grpc.unary_unary_rpc_method_handler(
                     servicer.find_responsible_node,
                     request_deserializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.FromString,
-                    response_serializer=RendezvousHashing__pb2.RendezvousFindNodeReply.SerializeToString,
+                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
+            ),
+            'add_node': grpc.unary_unary_rpc_method_handler(
+                    servicer.add_node,
+                    request_deserializer=RendezvousHashing__pb2.NodeInformation.FromString,
+                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
+            ),
+            'remove_node': grpc.unary_unary_rpc_method_handler(
+                    servicer.remove_node,
+                    request_deserializer=RendezvousHashing__pb2.NodeInformation.FromString,
+                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -61,6 +93,40 @@ class RendezvousHashing(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/find_responsible_node',
             RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-            RendezvousHashing__pb2.RendezvousFindNodeReply.FromString,
+            RendezvousHashing__pb2.Empty.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def add_node(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/add_node',
+            RendezvousHashing__pb2.NodeInformation.SerializeToString,
+            RendezvousHashing__pb2.Empty.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def remove_node(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/remove_node',
+            RendezvousHashing__pb2.NodeInformation.SerializeToString,
+            RendezvousHashing__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

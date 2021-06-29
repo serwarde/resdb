@@ -1,13 +1,20 @@
 syntax = "proto3";
 
 service RendezvousHashing {
-    rpc find_responsible_node (RendezvousFindNodeRequest) returns (RendezvousFindNodeReply) {};
+    rpc find_responsible_node (RendezvousFindNodeRequest) returns (Empty) {};
+    rpc add_node (NodeInformation) returns (Empty);
+    rpc remove_node (NodeInformation) returns (Empty);
 }
 
 message RendezvousFindNodeRequest {
     string key = 1;
+    string value = 2;
 }
-message RendezvousFindNodeReply {
+
+message NodeInformation {
     string name = 1;
     string ip_address = 2;
+}
+
+message Empty {
 }
