@@ -106,7 +106,6 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         """
         return self._objects_dict
     
-    # TODO: use enum for request.type in protobuffer 
     def get_request(self, request, context):
         """
         GRPC
@@ -118,15 +117,17 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         value = only necessary for add and update
         """
 
-        if request.type == "add":
+        if request.type == 0:
             self.add_object(request.key,request.value)
-        elif request.type == "remove":
-            self.remove_object(request.key,request.value)
-        elif request.type == "get":
+        elif request.type == 1:
+            self.update_object(request.key,request.value)
+        elif request.type == 2:
             self.get_object(request.key)
             # TODO: return value
-        elif request.type == "update":
-            self.update_object(request.key,request.value)
+        elif request.type == 3:
+            self.remove_object(request.key,request.value)
+        
+        
 
 def serve(name, ip_address, port, weight):
     channel = grpc.insecure_channel('172.17.0.2:50050')
