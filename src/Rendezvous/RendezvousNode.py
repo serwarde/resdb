@@ -20,7 +20,7 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         self._host_ip = ip_address
         self._http_port = port
         self._node_weight = weight
-        self._hashing = hashlib.md5()
+        self._hashing = hashlib.md5
         # TODO: Check if ip_address is a adequate seed for the node
         self._node_seed = str(ip_address)+str(name)
         # TODO: Check if a list is a good representation for values
@@ -34,8 +34,10 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         hash function the seed is appended to key. The hash is then converted to int and then 
         multplied by the node weight
         """
-        hash = self._hashing.update((request.key+self._host_ip).encode('utf-8')).hexdigest()
-        return RN_pb2.NodeHashValueForReply(float.fromhex(hash) * self._node_weight)
+        print(request.key)
+        hash = self._hashing((request.key+self._host_ip).encode('utf-8')).hexdigest()
+        final_hash = float.fromhex(hash) * self._node_weight
+        return RN_pb2.NodeHashValueForReply(hashValue=final_hash)
 
     # TODO: implement as a GRPC function. Since it needs to connect to the other node. Add_object is not a grpc function so use get_request()
     def send_item_to_new_node(self, node):
