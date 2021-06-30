@@ -7,10 +7,10 @@ import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
-class TestStringMethods(unittest.TestCase):
+class TestServerInformationMethods(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
-        super(TestStringMethods, self).__init__(*args, **kwargs)
+        super(TestServerInformationMethods, self).__init__(*args, **kwargs)
         channel = grpc.insecure_channel('localhost:50050')
         self.stub = SI_pb2_grpc.ServerInformationStub(channel)
 
