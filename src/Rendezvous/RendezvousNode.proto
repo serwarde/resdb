@@ -2,12 +2,18 @@ syntax = "proto3";
 
 service RendezvousNode {
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
-    rpc get_request (NodeGetRequest) returns (NodeGetReply) {};
-    
+    rpc get_request (NodeGetRequest) returns (NodeGetReply) {}; 
+}
+
+enum GetRequestType {
+    ADD = 0;
+    UPDATE = 1;
+    GET = 2;
+    DELETE = 3;
 }
 
 message NodeGetRequest {
-    string type = 1;
+    GetRequestType type = 1;
     string key = 2;
     string value = 3;
 }
@@ -19,5 +25,5 @@ message NodeHashValueForRequest {
 
 }
 message NodeHashValueForReply {
-    string hashValue = 1;
+    float hashValue = 1;
 }
