@@ -34,7 +34,6 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         hash function the seed is appended to key. The hash is then converted to int and then 
         multplied by the node weight
         """
-        print(request.key)
         hash = self._hashing((request.key+self._host_ip).encode('utf-8')).hexdigest()
         final_hash = float.fromhex(hash) * self._node_weight
         return RN_pb2.NodeHashValueForReply(hashValue=final_hash)
@@ -56,8 +55,7 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
 
         TODO: extend to working with dicts as values
         """
-        # using default dicts to ensure the possibility of adding multiple values
-        self._objects_dict[key] = self._objects_dict[key].append(value)
+        self._objects_dict[key].append(value)
 
     def remove_object(self, key, value=None):
         """
@@ -71,7 +69,7 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         """
         if key in self._objects_dict:
             if value:
-                self._objects_dict[key] = self._objects_dict[key].remove(value)
+                self._objects_dict[key].remove(value)
             else:
                 del self._objects_dict[key]
 
@@ -86,7 +84,7 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
 
         TODO: Check if necessary if we keep using lists as values in the defaultdict
         """
-        self._objects_dict[key] = self._objects_dict[key].append(value)
+        self._objects_dict[key].append(value)
     
     def get_object(self, key) -> Union[int,str,list,bool,tuple,dict]:
         """
@@ -116,16 +114,23 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         key = the key for the item that should be stored
         value = only necessary for add and update
         """
+        print(self._objects_dict)
 
         if request.type == 0:
             self.add_object(request.key,request.value)
+            return RN_pb2.NodeGetReply(message="Successfull")
         elif request.type == 1:
             self.update_object(request.key,request.value)
+            return RN_pb2.NodeGetReply(message="Successfull")
         elif request.type == 2:
-            self.get_object(request.key)
-            # TODO: return value
+            for value in self.get_object(request.key):
+                yield RN_pb2.NodeGetReply(value=value, message="Successfull")
         elif request.type == 3:
             self.remove_object(request.key,request.value)
+            return RN_pb2.NodeGetReply(message="Successfull")
+
+        return RN_pb2.NodeGetReply(message="-1")
+        
         
         
 

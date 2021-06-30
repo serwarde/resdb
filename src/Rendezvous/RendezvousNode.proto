@@ -1,8 +1,9 @@
 syntax = "proto3";
 
 service RendezvousNode {
+    rpc get_request (NodeGetRequest) returns (stream NodeGetReply) {};  
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
-    rpc get_request (NodeGetRequest) returns (NodeGetReply) {}; 
+    
 }
 
 enum GetRequestType {
@@ -15,9 +16,12 @@ enum GetRequestType {
 message NodeGetRequest {
     GetRequestType type = 1;
     string key = 2;
-    string value = 3;
+    optional string value = 3;
 }
+
 message NodeGetReply {
+    optional string value = 1;
+    optional string message = 2;
 }
 
 message NodeHashValueForRequest {
