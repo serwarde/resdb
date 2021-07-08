@@ -17,17 +17,17 @@ class RendezvousHashingStub(object):
         self.find_responsible_node = channel.unary_unary(
                 '/RendezvousHashing/find_responsible_node',
                 request_serializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
+                response_deserializer=RendezvousHashing__pb2.RendezvousEmpty.FromString,
                 )
         self.add_node = channel.unary_unary(
                 '/RendezvousHashing/add_node',
-                request_serializer=RendezvousHashing__pb2.NodeInformation.SerializeToString,
-                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
+                request_serializer=RendezvousHashing__pb2.RendezvousInformation.SerializeToString,
+                response_deserializer=RendezvousHashing__pb2.RendezvousEmpty.FromString,
                 )
         self.remove_node = channel.unary_unary(
                 '/RendezvousHashing/remove_node',
-                request_serializer=RendezvousHashing__pb2.NodeInformation.SerializeToString,
-                response_deserializer=RendezvousHashing__pb2.Empty.FromString,
+                request_serializer=RendezvousHashing__pb2.RendezvousInformation.SerializeToString,
+                response_deserializer=RendezvousHashing__pb2.RendezvousEmpty.FromString,
                 )
 
 
@@ -58,17 +58,17 @@ def add_RendezvousHashingServicer_to_server(servicer, server):
             'find_responsible_node': grpc.unary_unary_rpc_method_handler(
                     servicer.find_responsible_node,
                     request_deserializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.FromString,
-                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
+                    response_serializer=RendezvousHashing__pb2.RendezvousEmpty.SerializeToString,
             ),
             'add_node': grpc.unary_unary_rpc_method_handler(
                     servicer.add_node,
-                    request_deserializer=RendezvousHashing__pb2.NodeInformation.FromString,
-                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
+                    request_deserializer=RendezvousHashing__pb2.RendezvousInformation.FromString,
+                    response_serializer=RendezvousHashing__pb2.RendezvousEmpty.SerializeToString,
             ),
             'remove_node': grpc.unary_unary_rpc_method_handler(
                     servicer.remove_node,
-                    request_deserializer=RendezvousHashing__pb2.NodeInformation.FromString,
-                    response_serializer=RendezvousHashing__pb2.Empty.SerializeToString,
+                    request_deserializer=RendezvousHashing__pb2.RendezvousInformation.FromString,
+                    response_serializer=RendezvousHashing__pb2.RendezvousEmpty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -93,7 +93,7 @@ class RendezvousHashing(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/find_responsible_node',
             RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-            RendezvousHashing__pb2.Empty.FromString,
+            RendezvousHashing__pb2.RendezvousEmpty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -109,8 +109,8 @@ class RendezvousHashing(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/add_node',
-            RendezvousHashing__pb2.NodeInformation.SerializeToString,
-            RendezvousHashing__pb2.Empty.FromString,
+            RendezvousHashing__pb2.RendezvousInformation.SerializeToString,
+            RendezvousHashing__pb2.RendezvousEmpty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -126,7 +126,7 @@ class RendezvousHashing(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/remove_node',
-            RendezvousHashing__pb2.NodeInformation.SerializeToString,
-            RendezvousHashing__pb2.Empty.FromString,
+            RendezvousHashing__pb2.RendezvousInformation.SerializeToString,
+            RendezvousHashing__pb2.RendezvousEmpty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

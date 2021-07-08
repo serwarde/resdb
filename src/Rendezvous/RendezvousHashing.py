@@ -33,11 +33,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         request = SI_pb2.GetAllRequest(type=SI_pb2.NODE)
         responses = self.server_information_stub.get_all_(request)
         for response in responses:
-            self._list_of_nodes[response.ip_address] = response.name
+            self._list_of_nodes[response.name] = response.ip_address
 
     # TODO: update the ServerInformation
     # Done: add_node, remove_node are currently not working. they need to be callable by grpc.
     # Done: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
+    # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
     def add_node(self, request, context):
         """
         adds a new Node into the Router.
@@ -45,8 +46,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be added
         """
-        self._list_of_nodes[request.ip_address] = request.name
-        self.redistribute_objects_to_new_node(request.ip_address, request.name)
+        self._list_of_nodes[request.name] = request.ip_address
+        self.redistribute_objects_to_new_node(request.ip_address)
 
     def remove_node(self, request, context):
         """
@@ -55,26 +56,30 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be deleted
         """
-        del self._list_of_nodes[request.ip_address]
-        self.redistribute_objects_from_deleted_node(request.ip_address, request.name)
+        del self._list_of_nodes[request.name]
+        self.redistribute_objects_from_deleted_node(request.ip_address)
 
-    def redistribute_objects_to_new_node(self, ip_address, name):
+    def redistribute_objects_to_new_node(self, ip_address):
         """
         Redistributes all Key,Values of a all Nodes, if the new node is the champion
 
         node: the node that will be added
         """
         temp_list_of_nodes = self._list_of_node
-        del temp_list_of_nodes[ip_address]
 
         # TODO: threading?
-        for n_ip, n_name in temp_list_of_nodes.items():
+        for _, n_ip in temp_list_of_nodes.items():
             channel = grpc.insecure_channel(n_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
-            node_stub.send_item_to_new_node(ip_address, name)
+            request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
+            response = node_stub.send_item_to_new_node(request)
+            
+            # TODO: look into if this works
+            for _ in response:
+                pass
 
     # DONE: can we call the find_responsible_node function if we dont use rpc?
-    def redistribute_objects_from_deleted_node(self, ip_address, name):
+    def redistribute_objects_from_deleted_node(self, ip_address):
         """
         Redistributes all Key,Values of a deleted Node
 
