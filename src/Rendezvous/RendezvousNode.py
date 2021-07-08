@@ -151,10 +151,14 @@ def serve(name, ip_address, port, weight):
         server.stop(0)
 
 if __name__ == '__main__':
-    name = "node1"
-    port = 50250
+    parser = argparse.ArgumentParser(description='Create Rendezvous Node.')
+    parser.add_argument('--name', '-n', type=str, help='The name of the Node', default="node1")
+    parser.add_argument('--port', '-p', type=int, help='The port of the Node', default=50251)
+    parser.add_argument('--weight', '-w', type=float, help='The weight of the Node', default=1.0)
+    args = parser.parse_args()
+
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    weight = 1
-    print(f"starting Node '{name}': {ip_address}:{port} with {weight}.")
-    serve(name, ip_address, port, weight)
+    
+    print(f"starting Node '{args.name}': {ip_address}:{args.port} with {args.weight}.")
+    serve(args.name, ip_address, args.port, args.weight)
