@@ -1,2 +1,1 @@
-#!/bin/bash
-python ServerInformation.py
+python -m src.ServerInformation.ServerInformation -p $1

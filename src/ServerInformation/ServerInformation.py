@@ -2,6 +2,7 @@ import time
 from concurrent import futures
 import random
 import grpc
+import argparse
 
 import src.ServerInformation.ServerInformation_pb2 as ServerInformation_pb2
 import src.ServerInformation.ServerInformation_pb2_grpc as ServerInformation_pb2_grpc
@@ -71,10 +72,10 @@ class ServerInformation(ServerInformation_pb2_grpc.ServerInformationServicer):
         return False
 
 
-def serve():
+def serve(port):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     ServerInformation_pb2_grpc.add_ServerInformationServicer_to_server(ServerInformation(), server)
-    server.add_insecure_port('0.0.0.0:50050')
+    server.add_insecure_port(f'0.0.0.0:{port}')
     server.start()
     try:
         server.wait_for_termination()
@@ -83,4 +84,7 @@ def serve():
 
 
 if __name__ == '__main__':
-    serve()
+    parser = argparse.ArgumentParser(description='Create ServerInformation.')
+    parser.add_argument('--port', '-p', type=int, help='The port of the ServerInformation', default=50050)
+    args = parser.parse_args()
+    serve(args.port)
