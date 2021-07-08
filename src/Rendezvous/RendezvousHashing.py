@@ -32,7 +32,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
         request = SI_pb2.GetAllRequest(type=SI_pb2.NODE)
         responses = self.server_information_stub.get_all_(request)
-        for i, response in enumerate(responses):
+        for response in responses:
             self._list_of_nodes[response.ip_address] = response.name
 
     # TODO: update the ServerInformation
