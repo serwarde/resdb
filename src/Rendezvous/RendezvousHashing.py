@@ -12,6 +12,7 @@ import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
 
 import grpc
 import socket
+import argparse
 from concurrent import futures
 
 # look how to import from AbstractRouterClass since it is our abstract class. Maybe like this: RendezvousHashing(AbstractRouterClass(RH_pb2_grpc.RendezvousHashingServicer))
@@ -152,10 +153,13 @@ def serve(name, ip_address, port):
 
 
 if __name__ == "__main__":
-    name = "Router1"
-    port = 50150
+    parser = argparse.ArgumentParser(description='Create Rendezvous Router.')
+    parser.add_argument('--name', '-n', type=str, help='The name of the Router', default="router1")
+    parser.add_argument('--port', '-p', type=int, help='The port of the Router', default=50151)
+    args = parser.parse_args()
+    
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     weight = 1
-    print(f"starting Router '{name}': {ip_address}:{port}.")
-    serve(name, ip_address, port)
+    print(f"starting Router '{args.name}': {ip_address}:{args.port}.")
+    serve(args.name, ip_address, args.port)
