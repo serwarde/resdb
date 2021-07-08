@@ -38,25 +38,25 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
     # TODO: update the ServerInformation
     # Done: add_node, remove_node are currently not working. they need to be callable by grpc.
     # Done: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
-    def add_node(self, node):
+    def add_node(self, request, context):
         """
         adds a new Node into the Router.
         Also handles node balancing
 
         node: the node that should be added
         """
-        self._list_of_nodes[node.ip_address] = node.name
-        self.redistribute_objects_to_new_node(node.ip_address, node.name)
+        self._list_of_nodes[request.ip_address] = request.name
+        self.redistribute_objects_to_new_node(request.ip_address, request.name)
 
-    def remove_node(self, node):
+    def remove_node(self, request, context):
         """
         removes a Node from the Router.
         Also handles node balancing
 
         node: the node that should be deleted
         """
-        del self._list_of_nodes[node.ip_address]
-        self.redistribute_objects_from_deleted_node(node.ip_address, node.name)
+        del self._list_of_nodes[request.ip_address]
+        self.redistribute_objects_from_deleted_node(request.ip_address, request.name)
 
     def redistribute_objects_to_new_node(self, ip_address, name):
         """
