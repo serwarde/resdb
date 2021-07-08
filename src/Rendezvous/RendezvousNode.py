@@ -1,8 +1,10 @@
 from src.Node.node_abstract import AbstractNodeClass
 from typing import DefaultDict, Union
 from collections import defaultdict
+
 import hashlib
 import socket
+import argparse
 
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
 import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
@@ -69,7 +71,10 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         """
         if key in self._objects_dict:
             if value:
-                self._objects_dict[key].remove(value)
+                try:
+                    self._objects_dict[key].remove(value)
+                except ValueError:
+                    pass # do nothing if the value is not in the list
             else:
                 del self._objects_dict[key]
 
@@ -118,18 +123,16 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
 
         if request.type == 0:
             self.add_object(request.key,request.value)
-            return RN_pb2.NodeGetReply(message="Successfull")
+            return RN_pb2.NodeGetReply()
         elif request.type == 1:
             self.update_object(request.key,request.value)
-            return RN_pb2.NodeGetReply(message="Successfull")
+            return RN_pb2.NodeGetReply()
         elif request.type == 2:
             for value in self.get_object(request.key):
-                yield RN_pb2.NodeGetReply(value=value, message="Successfull")
+                yield RN_pb2.NodeGetReply(value=value)
         elif request.type == 3:
             self.remove_object(request.key,request.value)
-            return RN_pb2.NodeGetReply(message="Successfull")
-
-        return RN_pb2.NodeGetReply(message="-1")
+            return RN_pb2.NodeGetReply()
         
         
         

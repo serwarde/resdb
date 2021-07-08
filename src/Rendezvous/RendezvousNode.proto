@@ -21,7 +21,6 @@ message NodeGetRequest {
 
 message NodeGetReply {
     optional string value = 1;
-    optional string message = 2;
 }
 
 message NodeHashValueForRequest {
