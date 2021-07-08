@@ -141,6 +141,8 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         
         self.assertEqual(len(values), len(x), "len(values) != len(responses)")
         self.assertListEqual(values, x)    
-        
+
+
+    # TODO: test send_item_to_new_node
 if __name__ == '__main__':
     unittest.main()
