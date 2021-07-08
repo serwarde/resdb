@@ -24,6 +24,11 @@ class RendezvousNodeStub(object):
                 request_serializer=RendezvousNode__pb2.NodeHashValueForRequest.SerializeToString,
                 response_deserializer=RendezvousNode__pb2.NodeHashValueForReply.FromString,
                 )
+        self.send_item_to_new_node = channel.unary_unary(
+                '/RendezvousNode/send_item_to_new_node',
+                request_serializer=RendezvousNode__pb2.NodeSendItemToNewNodeRequest.SerializeToString,
+                response_deserializer=RendezvousNode__pb2.NodeEmpty.FromString,
+                )
 
 
 class RendezvousNodeServicer(object):
@@ -41,6 +46,12 @@ class RendezvousNodeServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def send_item_to_new_node(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RendezvousNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -53,6 +64,11 @@ def add_RendezvousNodeServicer_to_server(servicer, server):
                     servicer.hash_value_for_key,
                     request_deserializer=RendezvousNode__pb2.NodeHashValueForRequest.FromString,
                     response_serializer=RendezvousNode__pb2.NodeHashValueForReply.SerializeToString,
+            ),
+            'send_item_to_new_node': grpc.unary_unary_rpc_method_handler(
+                    servicer.send_item_to_new_node,
+                    request_deserializer=RendezvousNode__pb2.NodeSendItemToNewNodeRequest.FromString,
+                    response_serializer=RendezvousNode__pb2.NodeEmpty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -95,5 +111,22 @@ class RendezvousNode(object):
         return grpc.experimental.unary_unary(request, target, '/RendezvousNode/hash_value_for_key',
             RendezvousNode__pb2.NodeHashValueForRequest.SerializeToString,
             RendezvousNode__pb2.NodeHashValueForReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def send_item_to_new_node(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RendezvousNode/send_item_to_new_node',
+            RendezvousNode__pb2.NodeSendItemToNewNodeRequest.SerializeToString,
+            RendezvousNode__pb2.NodeEmpty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

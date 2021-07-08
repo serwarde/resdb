@@ -36,16 +36,44 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         hash function the seed is appended to key. The hash is then converted to int and then 
         multplied by the node weight
         """
-        hash = self._hashing((request.key+self._host_ip).encode('utf-8')).hexdigest()
-        final_hash = float.fromhex(hash) * self._node_weight
-        return RN_pb2.NodeHashValueForReply(hashValue=final_hash)
+        return RN_pb2.NodeHashValueForReply(hashValue=self.hash_value(request.key))
 
-    # TODO: implement as a GRPC function. Since it needs to connect to the other node. Add_object is not a grpc function so use get_request()
-    def send_item_to_new_node(self, node):
-        for k,v in self._objects_dict.items():
-            if node.hash_value_for_key(k) >= self.hash_value_for_key(k):
-                node.add_object(k,v)
+    def hash_value(self, key) -> float:
+        """
+        returns the hash for a given key. Uses sha256 for creating the hash value. In the
+        hash function the seed is appended to key. The hash is then converted to int and then 
+        multplied by the node weight
+        """
+        hash = self._hashing((key+self._host_ip).encode('utf-8')).hexdigest()
+        final_hash = float.fromhex(hash) * self._node_weight
+        return float.fromhex(hash) * self._node_weight
+
+    # Done: implement as a GRPC function. Since it needs to connect to the other node.
+    def send_item_to_new_node(self, request, context):
+
+        channel = grpc.insecure_channel(request.ip_address)
+        node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+
+        for k,vs in self._objects_dict.items():
+            request_node = RN_pb2.NodeHashValueForRequest(k)
+            newNodeValue = node_stub.hash_value_for_key(request_node)
+
+            if newNodeValue >= self.hash_value(k):
+
+                # we may have multiple values
+                # TODO: use stream instead of unique calls
                 # TODO: maybe store hash values of the keys?
+                for v in vs:
+                    request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key=k,value=v)
+                    responses = node_stub.get_request(request)
+
+                    for _ in responses:
+                        pass
+
+                self.remove_object(k)
+
+        return RN_pb2.NodeEmpty()
+                
 
     def add_object(self, key, value):
         """

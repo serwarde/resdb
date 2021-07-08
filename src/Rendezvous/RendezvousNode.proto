@@ -3,7 +3,7 @@ syntax = "proto3";
 service RendezvousNode {
     rpc get_request (NodeGetRequest) returns (stream NodeGetReply) {};  
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
-    
+    rpc send_item_to_new_node (NodeSendItemToNewNodeRequest) returns (NodeEmpty) {};
 }
 
 enum GetRequestType {
@@ -29,4 +29,11 @@ message NodeHashValueForRequest {
 }
 message NodeHashValueForReply {
     float hashValue = 1;
+}
+
+message NodeSendItemToNewNodeRequest {
+    string ip_address = 1;
+}
+
+message NodeEmpty {
 }
