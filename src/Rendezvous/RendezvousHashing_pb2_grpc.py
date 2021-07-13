@@ -14,8 +14,8 @@ class RendezvousHashingStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.find_responsible_node = channel.unary_unary(
-                '/RendezvousHashing/find_responsible_node',
+        self.forward_to_responsible_node = channel.unary_unary(
+                '/RendezvousHashing/forward_to_responsible_node',
                 request_serializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
                 response_deserializer=RendezvousHashing__pb2.RendezvousEmpty.FromString,
                 )
@@ -34,7 +34,7 @@ class RendezvousHashingStub(object):
 class RendezvousHashingServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def find_responsible_node(self, request, context):
+    def forward_to_responsible_node(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -55,8 +55,8 @@ class RendezvousHashingServicer(object):
 
 def add_RendezvousHashingServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'find_responsible_node': grpc.unary_unary_rpc_method_handler(
-                    servicer.find_responsible_node,
+            'forward_to_responsible_node': grpc.unary_unary_rpc_method_handler(
+                    servicer.forward_to_responsible_node,
                     request_deserializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.FromString,
                     response_serializer=RendezvousHashing__pb2.RendezvousEmpty.SerializeToString,
             ),
@@ -81,7 +81,7 @@ class RendezvousHashing(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def find_responsible_node(request,
+    def forward_to_responsible_node(request,
             target,
             options=(),
             channel_credentials=None,
@@ -91,7 +91,7 @@ class RendezvousHashing(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/find_responsible_node',
+        return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/forward_to_responsible_node',
             RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
             RendezvousHashing__pb2.RendezvousEmpty.FromString,
             options, channel_credentials,

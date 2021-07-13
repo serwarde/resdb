@@ -1,16 +1,10 @@
 syntax = "proto3";
+import "type.proto";
 
 service RendezvousNode {
     rpc get_request (NodeGetRequest) returns (stream NodeGetReply) {};  
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
     rpc send_item_to_new_node (NodeSendItemToNewNodeRequest) returns (NodeEmpty) {};
-}
-
-enum GetRequestType {
-    ADD = 0;
-    UPDATE = 1;
-    GET = 2;
-    DELETE = 3;
 }
 
 message NodeGetRequest {

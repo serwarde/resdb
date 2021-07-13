@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+enum GetRequestType {
+    ADD = 0;
+    UPDATE = 1;
+    GET = 2;
+    DELETE = 3;
+}

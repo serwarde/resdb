@@ -208,7 +208,6 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             pass
         self.tst_value_for_key("Serwar", [])
 
-
     def tst_value_for_key(self, key, values, stub=0):
 
         request = RN_pb2.NodeGetRequest(type=RN_pb2.GET,key=key)
@@ -226,7 +225,6 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
 
     """request = RN_pb2.NodeHashValueForRequest(key="Sam")
     response = stub.hash_value_for_key(request)
