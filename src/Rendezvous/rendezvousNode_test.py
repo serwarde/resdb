@@ -11,6 +11,8 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             super(TestRendezvousNodeMethods, self).__init__(*args, **kwargs)
             channel = grpc.insecure_channel('localhost:50251')
             self.stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+            channel = grpc.insecure_channel('localhost:50252')
+            self.stub2 = RN_pb2_grpc.RendezvousNodeStub(channel)
 
     def test1_hash(self):
         # Get Hash values for diffrent keys
@@ -130,10 +132,90 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             pass
         self.tst_value_for_key("Test", [])
 
-    def tst_value_for_key(self, key, values):
+        # delete all for sam
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+        self.tst_value_for_key("Sam", [])
+
+    # TODO: test send_item_to_new_node
+    def test4_send_item_to_new_node(self):
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="14")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sand",value="34")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Nico",value="54")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Nico",value="612")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Serwar",value="54")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+
+        request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address="172.17.0.5:50252")
+        responses = self.stub.send_item_to_new_node(request)
+
+        self.tst_value_for_key("Sam", ["14"])
+        self.tst_value_for_key("Sand", ["34"])
+        self.tst_value_for_key("Nico", [])
+        self.tst_value_for_key("Serwar", [])
+
+        self.tst_value_for_key("Sam", [], 1)
+        self.tst_value_for_key("Sand", [], 1)
+        self.tst_value_for_key("Nico", ["54", "612"], 1)
+        self.tst_value_for_key("Serwar", ["54"], 1)
+
+    def test5_delete_all(self):
+        # delete all for sam
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+        self.tst_value_for_key("Sam", [])
+
+        # delete all for sand
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sand")
+        responses = self.stub.get_request(request)
+        for i in responses:
+            pass
+        self.tst_value_for_key("Sand", [])
+
+        # delete all for nico
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Nico")
+        responses = self.stub2.get_request(request)
+        for i in responses:
+            pass
+        self.tst_value_for_key("Nico", [])
+
+        # delete all for Serwar
+        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Serwar")
+        responses = self.stub2.get_request(request)
+        for i in responses:
+            pass
+        self.tst_value_for_key("Serwar", [])
+
+
+    def tst_value_for_key(self, key, values, stub=0):
 
         request = RN_pb2.NodeGetRequest(type=RN_pb2.GET,key=key)
-        responses = self.stub.get_request(request)
+        if stub==0:
+            responses = self.stub.get_request(request)
+        else:
+            responses = self.stub2.get_request(request)
         
         x = []
         for response in responses:
@@ -142,7 +224,30 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.assertEqual(len(values), len(x), "len(values) != len(responses)")
         self.assertListEqual(values, x)    
 
-
-    # TODO: test send_item_to_new_node
 if __name__ == '__main__':
     unittest.main()
+
+
+    """request = RN_pb2.NodeHashValueForRequest(key="Sam")
+    response = stub.hash_value_for_key(request)
+    request = RN_pb2.NodeHashValueForRequest(key="Sam")
+    response2 = stub2.hash_value_for_key(request)
+    print(response.hashValue > response2.hashValue)
+
+    request = RN_pb2.NodeHashValueForRequest(key="Nico")
+    response = stub.hash_value_for_key(request)
+    request = RN_pb2.NodeHashValueForRequest(key="Nico")
+    response2 = stub2.hash_value_for_key(request)
+    print(response.hashValue > response2.hashValue)
+
+    request = RN_pb2.NodeHashValueForRequest(key="Serwar")
+    response = stub.hash_value_for_key(request)
+    request = RN_pb2.NodeHashValueForRequest(key="Serwar")
+    response2 = stub2.hash_value_for_key(request)
+    print(response.hashValue > response2.hashValue)
+
+    request = RN_pb2.NodeHashValueForRequest(key="Sand")
+    response = stub.hash_value_for_key(request)
+    request = RN_pb2.NodeHashValueForRequest(key="Sand")
+    response2 = stub2.hash_value_for_key(request)
+    print(response.hashValue > response2.hashValue)"""
