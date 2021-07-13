@@ -50,15 +50,24 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
 
     # Done: implement as a GRPC function. Since it needs to connect to the other node.
     def send_item_to_new_node(self, request, context):
+        """
+        GRPC
+
+        this function is called when we add a new node. It loops over all keys in its own 
+        dict and checks if the hashValue of the new Node is higher then the own. If yes it 
+        sends the key, value pair to the new node, where it now is stored. After sending it 
+        deletes the kv-pair in the own dictionary
+        """
 
         channel = grpc.insecure_channel(request.ip_address)
         node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-        for k,vs in self._objects_dict.items():
-            request_node = RN_pb2.NodeHashValueForRequest(k)
+        # we need to copy, else we get an error, that the dict changed in size if we delete anything
+        for k,vs in self._objects_dict.copy().items():
+            request_node = RN_pb2.NodeHashValueForRequest(key=k)
             newNodeValue = node_stub.hash_value_for_key(request_node)
 
-            if newNodeValue >= self.hash_value(k):
+            if newNodeValue.hashValue >= self.hash_value(k):
 
                 # we may have multiple values
                 # TODO: use stream instead of unique calls
