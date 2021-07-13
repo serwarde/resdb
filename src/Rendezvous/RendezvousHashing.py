@@ -38,7 +38,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
     # TODO: update the ServerInformation
     # Done: add_node, remove_node are currently not working. they need to be callable by grpc.
     # Done: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
-    # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
     def add_node(self, request, context):
         """
         adds a new Node into the Router.
@@ -78,7 +77,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             for _ in response:
                 pass
 
-    # DONE: can we call the find_responsible_node function if we dont use rpc?
+    # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
+    # DONE: can we call the forward_to_responsible_node function if we dont use rpc?
     def redistribute_objects_from_deleted_node(self, ip_address):
         """
         Redistributes all Key,Values of a deleted Node
@@ -96,11 +96,11 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         # TODO: This solution is probably not efficient, but I'm not sure whether it's a design or programming issue. 
         for k, v in objects_on_node.items():
-            self.find_responsible_node(k, v)
+            self.forward_to_responsible_node(k, v)
 
 
     # DONE: the request gets forwarded directly from the router after finding the responsible node
-    def find_responsible_node(self, request, context):
+    def forward_to_responsible_node(self, request, context):
         """
         finds the responsible node, for a given key
 
@@ -113,10 +113,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         maxValue = -1
 
         # TODO: threading
-        for node in self._list_of_nodes:
+        for _, n_ip in self._list_of_nodes.copy().items():
             # note: a node tuple consists of an ip_address and name
             # connect to the node
-            channel = grpc.insecure_channel(node[0])
+            channel = grpc.insecure_channel(n_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             # calc the hash score from the node
@@ -126,15 +126,14 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             # check if node is the biggest
             if currentValue.hashValue > maxValue:
                 maxValue = currentValue.hashValue
-                champion_ip = node[0]
-                champion_name = node[1]
+                champion_ip = n_ip
 
-        # creates a connection to the node
+        # creates a connection to the champion node
         channel = grpc.insecure_channel(champion_ip)
         node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-        # sends a the request to the node
-        request = RN_pb2.NodeGetRequest(type, request.key, request.value)
+        # sends the request to the node
+        request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
         node_stub.get_request(request)
 
 

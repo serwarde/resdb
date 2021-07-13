@@ -35,10 +35,11 @@ class LoadBalancer():
         router_stub = self.get_random_router()
 
         # creates a request and gets the ip_address of a the responsible node
-        request = RH_pb2.RendezvousFindNodeRequest(key, value)
-        response = router_stub.find_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(type=type, key=key, value=value)
+        response = router_stub.forward_to_responsible_node(request)
+
+        print(response)
         
-        # DONE: the request gets forwarded directly from the router after finding the responsible node 
     
     def get_random_router(self):
         """
