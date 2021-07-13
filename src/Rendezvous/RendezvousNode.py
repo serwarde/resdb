@@ -11,6 +11,8 @@ import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
 import src.ServerInformation.ServerInformation_pb2 as SI_pb2
 import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
 
+import src.Rendezvous.type_pb2 as type_pb2
+
 import grpc
 from concurrent import futures
 
@@ -73,7 +75,7 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
                 # TODO: use stream instead of unique calls
                 # TODO: maybe store hash values of the keys?
                 for v in vs:
-                    request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key=k,value=v)
+                    request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=k,value=v)
                     responses = node_stub.get_request(request)
 
                     for _ in responses:

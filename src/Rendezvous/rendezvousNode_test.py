@@ -3,6 +3,9 @@ import time
 
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
 import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
+
+import src.Rendezvous.type_pb2 as type_pb2
+
 import time
 import unittest
 
@@ -40,25 +43,25 @@ class TestRendezvousNodeMethods(unittest.TestCase):
     # TODO: look into why this is the case
     def test2_add(self):
         # add entries to the dict
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["24"])
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="14")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["24", "14"])
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="42")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="42")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["24", "14", "42"])
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sand",value="18")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",value="18")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
@@ -66,74 +69,74 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def test3_delete(self):
         # delete a key that exists
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam",value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["14", "42"])
         
         # delete all with values left
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", [])
 
         # delete all with values left
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sand")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sand")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sand", [])
 
         # delete all with no values left
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sand")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sand")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sand", [])
 
         # add two times the same element
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         
         # TODO: should it just delete the first occurance or all occurances???
         # delete element if it is 2 times in the list
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam", value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["24"])
 
         # delete value what is not in the list
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam", value="32")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", value="32")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", ["24"])
 
         # delete value where key is not in list
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Test", value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Test", value="24")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Test", [])
 
         # delete all where key is not in list
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Test")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Test")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Test", [])
 
         # delete all for sam
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
@@ -141,27 +144,27 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     # TODO: test send_item_to_new_node
     def test4_send_item_to_new_node(self):
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sam",value="14")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Sand",value="34")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",value="34")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Nico",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="54")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Nico",value="612")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="612")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.ADD,key="Serwar",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",value="54")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
@@ -181,28 +184,28 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def test5_delete_all(self):
         # delete all for sam
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sam")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sam", [])
 
         # delete all for sand
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Sand")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sand")
         responses = self.stub.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Sand", [])
 
         # delete all for nico
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Nico")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Nico")
         responses = self.stub2.get_request(request)
         for i in responses:
             pass
         self.tst_value_for_key("Nico", [])
 
         # delete all for Serwar
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.DELETE,key="Serwar")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Serwar")
         responses = self.stub2.get_request(request)
         for i in responses:
             pass
@@ -210,7 +213,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def tst_value_for_key(self, key, values, stub=0):
 
-        request = RN_pb2.NodeGetRequest(type=RN_pb2.GET,key=key)
+        request = RN_pb2.NodeGetRequest(type=type_pb2.GET,key=key)
         if stub==0:
             responses = self.stub.get_request(request)
         else:
