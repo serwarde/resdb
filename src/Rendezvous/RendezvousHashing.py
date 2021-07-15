@@ -25,7 +25,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         self._list_of_nodes = {}
         self.get_all_nodes()
 
-    # DONE: save the nodes locally
     def get_all_nodes(self):
         """
         Updated the list of all available nodes from the ServerInformation
@@ -35,9 +34,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         for response in responses:
             self._list_of_nodes[response.name] = response.ip_address
 
-    # TODO: update the ServerInformation
-    # Done: add_node, remove_node are currently not working. they need to be callable by grpc.
-    # Done: redistribute_objects_from_deleted_node, redistribute_objects_to_new_node should use grpc to call the nodes
+    # TODO: if we use multiple routers, we need to ensure that all of them have the same _list_of_nodes, currently its gets only updated in the init.
+    # DONE: update the ServerInformation, since its updated, when a new node launches
     def add_node(self, request, context):
         """
         adds a new Node into the Router.
@@ -45,9 +43,32 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be added
         """
+        print(self._list_of_nodes)
         self._list_of_nodes[request.name] = request.ip_address
         self.redistribute_objects_to_new_node(request.ip_address)
+        return RH_pb2.RendezvousEmpty()
 
+    def redistribute_objects_to_new_node(self, ip_address):
+        """
+        Redistributes all Key,Values of a all Nodes, if the new node is the champion
+
+        node: the node that will be added
+        """
+
+        # TODO: threading?
+        for _, n_ip in self._list_of_nodes.copy().items():
+            if n_ip == ip_address:
+                continue
+
+            # TODO: catch if we cant connect to the node
+            channel = grpc.insecure_channel(n_ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+            request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
+            # TODO: look into if this works
+            node_stub.send_item_to_new_node(request)
+
+    # TODO: update the ServerInformation
+    # TODO: remove_node not working
     def remove_node(self, request, context):
         """
         removes a Node from the Router.
@@ -57,25 +78,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
         del self._list_of_nodes[request.name]
         self.redistribute_objects_from_deleted_node(request.ip_address)
-
-    def redistribute_objects_to_new_node(self, ip_address):
-        """
-        Redistributes all Key,Values of a all Nodes, if the new node is the champion
-
-        node: the node that will be added
-        """
-        temp_list_of_nodes = self._list_of_node
-
-        # TODO: threading?
-        for _, n_ip in temp_list_of_nodes.items():
-            channel = grpc.insecure_channel(n_ip)
-            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
-            request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
-            response = node_stub.send_item_to_new_node(request)
-            
-            # TODO: look into if this works
-            for _ in response:
-                pass
 
     # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
     # DONE: can we call the forward_to_responsible_node function if we dont use rpc?
@@ -138,6 +140,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
 
 def serve(name, ip_address, port):
+    # connects to the server information and registers itself
     channel = grpc.insecure_channel("172.17.0.2:50050")
     server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
 
@@ -146,6 +149,7 @@ def serve(name, ip_address, port):
     )
     _ = server_information_stub.add_(request)
 
+    # starts the grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RH_pb2_grpc.add_RendezvousHashingServicer_to_server(RendezvousHashing(), server)
     server.add_insecure_port(f"{ip_address}:{port}")
@@ -157,6 +161,7 @@ def serve(name, ip_address, port):
 
 
 if __name__ == "__main__":
+    # arguments
     parser = argparse.ArgumentParser(description='Create Rendezvous Router.')
     parser.add_argument('--name', '-n', type=str, help='The name of the Router', default="router1")
     parser.add_argument('--port', '-p', type=int, help='The port of the Router', default=50151)
@@ -164,6 +169,6 @@ if __name__ == "__main__":
     
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    weight = 1
+    
     print(f"starting Router '{args.name}': {ip_address}:{args.port}.")
     serve(args.name, ip_address, args.port)
