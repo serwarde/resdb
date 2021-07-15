@@ -122,7 +122,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             # calc the hash score from the node
-            request_node = RN_pb2.NodeHashValueForRequest(request.key)
+            request_node = RN_pb2.NodeHashValueForRequest(key=request.key)
             currentValue = node_stub.hash_value_for_key(request_node)
 
             # check if node is the biggest
@@ -136,8 +136,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         # sends the request to the node
         request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
-        node_stub.get_request(request)
+        responses = node_stub.get_request(request)
 
+        for i in responses:
+            pass
+
+        return RH_pb2.RendezvousEmpty()
 
 def serve(name, ip_address, port):
     # connects to the server information and registers itself
