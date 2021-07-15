@@ -16,8 +16,7 @@ import src.Rendezvous.type_pb2 as type_pb2
 import grpc
 from concurrent import futures
 
-# TODO: look how to import from AbstractNodeClass since it is our abstract class. Maybe like this: RendezvousNode(AbstractNodeClass(RN_pb2_grpc.RendezvousNodeServicer))
-class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
+class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
     def __init__(self, name, ip_address, port, weight):
         self._host_name = name
@@ -65,23 +64,23 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
         # we need to copy, else we get an error, that the dict changed in size if we delete anything
-        for k,vs in self._objects_dict.copy().items():
-            request_node = RN_pb2.NodeHashValueForRequest(key=k)
+        for key,vs in self._objects_dict.copy().items():
+            request_node = RN_pb2.NodeHashValueForRequest(key=key)
             newNodeValue = node_stub.hash_value_for_key(request_node)
 
-            if newNodeValue.hashValue >= self.hash_value(k):
+            if newNodeValue.hashValue >= self.hash_value(key):
 
                 # we may have multiple values
                 # TODO: use stream instead of unique calls
                 # TODO: maybe store hash values of the keys?
                 for v in vs:
-                    request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=k,value=v)
+                    request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,value=v)
                     responses = node_stub.get_request(request)
 
                     for _ in responses:
                         pass
 
-                self.remove_object(k)
+                self.remove_object(key)
 
         return RN_pb2.NodeEmpty()
                 
@@ -139,14 +138,15 @@ class RendezvousNode(RN_pb2_grpc.RendezvousNodeServicer):
         """
         return self._objects_dict[key]
 
-    # TODO: implement as GRPC
-    def get_objects(self) -> dict:
+    def get_objects(self, request, context) -> dict:
         """
-        not GRPC
+        GRPC
 
         returns all objects in node
         """
-        return self._objects_dict
+        for key, values in self._objects_dict.copy().items():
+            for value in values:
+                yield RN_pb2.NodeGetObjectsReply(key=key, value=value)
     
     def get_request(self, request, context):
         """

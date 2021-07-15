@@ -19,6 +19,11 @@ class RendezvousNodeStub(object):
                 request_serializer=RendezvousNode__pb2.NodeGetRequest.SerializeToString,
                 response_deserializer=RendezvousNode__pb2.NodeGetReply.FromString,
                 )
+        self.get_objects = channel.unary_stream(
+                '/RendezvousNode/get_objects',
+                request_serializer=RendezvousNode__pb2.NodeEmpty.SerializeToString,
+                response_deserializer=RendezvousNode__pb2.NodeGetObjectsReply.FromString,
+                )
         self.hash_value_for_key = channel.unary_unary(
                 '/RendezvousNode/hash_value_for_key',
                 request_serializer=RendezvousNode__pb2.NodeHashValueForRequest.SerializeToString,
@@ -35,6 +40,12 @@ class RendezvousNodeServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def get_request(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def get_objects(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -59,6 +70,11 @@ def add_RendezvousNodeServicer_to_server(servicer, server):
                     servicer.get_request,
                     request_deserializer=RendezvousNode__pb2.NodeGetRequest.FromString,
                     response_serializer=RendezvousNode__pb2.NodeGetReply.SerializeToString,
+            ),
+            'get_objects': grpc.unary_stream_rpc_method_handler(
+                    servicer.get_objects,
+                    request_deserializer=RendezvousNode__pb2.NodeEmpty.FromString,
+                    response_serializer=RendezvousNode__pb2.NodeGetObjectsReply.SerializeToString,
             ),
             'hash_value_for_key': grpc.unary_unary_rpc_method_handler(
                     servicer.hash_value_for_key,
@@ -94,6 +110,23 @@ class RendezvousNode(object):
         return grpc.experimental.unary_stream(request, target, '/RendezvousNode/get_request',
             RendezvousNode__pb2.NodeGetRequest.SerializeToString,
             RendezvousNode__pb2.NodeGetReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def get_objects(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/RendezvousNode/get_objects',
+            RendezvousNode__pb2.NodeEmpty.SerializeToString,
+            RendezvousNode__pb2.NodeGetObjectsReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
