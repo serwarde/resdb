@@ -142,7 +142,6 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             pass
         self.tst_value_for_key("Sam", [])
 
-    # TODO: test send_item_to_new_node
     def test4_send_item_to_new_node(self):
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
         responses = self.stub.get_request(request)
