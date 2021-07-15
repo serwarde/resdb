@@ -9,6 +9,8 @@ import src.Rendezvous.type_pb2 as type_pb2
 import time
 import unittest
 
+from collections import defaultdict
+
 class TestRendezvousNodeMethods(unittest.TestCase):
     def __init__(self, *args, **kwargs):
             super(TestRendezvousNodeMethods, self).__init__(*args, **kwargs)
@@ -67,7 +69,21 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             pass
         self.tst_value_for_key("Sand", ["18"])
 
-    def test3_delete(self):
+    def test3_get_objects(self):
+        objects_on_node = defaultdict(list)
+        request = RN_pb2.NodeEmpty()
+        responses = self.stub.get_objects(request)
+
+        for response in responses:
+            objects_on_node[response.key].append(response.value)
+
+        self.assertEqual(len(objects_on_node["Sam"]), len(["24", "14", "42"]), "len(values) != len(responses)")
+        self.assertListEqual(objects_on_node["Sam"], ["24", "14", "42"])
+
+        self.assertEqual(len(objects_on_node["Sand"]), len(["18"]), "len(values) != len(responses)")
+        self.assertListEqual(objects_on_node["Sand"], ["18"])
+
+    def test4_delete(self):
         # delete a key that exists
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam",value="24")
         responses = self.stub.get_request(request)
@@ -142,7 +158,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
             pass
         self.tst_value_for_key("Sam", [])
 
-    def test4_send_item_to_new_node(self):
+    def test5_send_item_to_new_node(self):
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
         responses = self.stub.get_request(request)
         for i in responses:
@@ -181,7 +197,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.tst_value_for_key("Nico", ["54", "612"], 1)
         self.tst_value_for_key("Serwar", ["54"], 1)
 
-    def test5_delete_all(self):
+    def test6_delete_all(self):
         # delete all for sam
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam")
         responses = self.stub.get_request(request)
