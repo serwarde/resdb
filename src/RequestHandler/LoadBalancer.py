@@ -26,9 +26,9 @@ class LoadBalancer():
         gets a request from the user and calculates the responsible node
         and the forwards the request to this node
         
-        type = can be (get, add, remove or update)
+        type = can be (get, add or remove)
         key = the key for the item that should be stored
-        value = only necessary for add and update
+        value = only necessary for add
         '''
 
         # gets the router stub
