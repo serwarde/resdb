@@ -38,7 +38,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             self._dict_nodes[response.name] = response.ip_address
 
     # TODO: if we use multiple routers, we need to ensure that all of them have the same _dict_nodes, currently its gets only updated in the init.
-    # TODO: Serverinfomration send an update when a node gets added or delted
+    # TODO: Serverinfomration send an update when a node gets added or deleted
     # DONE: update the ServerInformation, since its updated, when a new node launches
     # TODO: rethink done above. We maybe should just do it in the add_node
     # TODO: add paramerter so we can use this function to update the information in all nodes
@@ -81,12 +81,15 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be deleted
         """
-        request = SI_pb2.DeleteRequest(type=SI_pb2.NODE, name=request.name)
-        self.stub.delete_(request)
+        # TODO: check if node with ip is in the list
+
+        request_sis = SI_pb2.DeleteRequest(type=SI_pb2.NODE, name=request.name)
+        self.server_information_stub.delete_(request_sis)
 
         del self._dict_nodes[request.name]
         
         self.redistribute_objects_from_deleted_node(request.ip_address)
+        return RH_pb2.RendezvousEmpty()
 
     # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
     # DONE: can we call the forward_to_responsible_node function if we dont use rpc?
@@ -99,7 +102,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         objects_on_node = defaultdict(list)
         channel = grpc.insecure_channel(ip_address)
         node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
-        responses = node_stub.get_objects()
+        request = RN_pb2.NodeEmpty()
+        responses = node_stub.get_objects(request)
+
+        print("started the channel")
 
         # reconstruct the dictionary of objects saved on the node
         for response in responses:
