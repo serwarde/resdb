@@ -7,7 +7,7 @@ import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
 import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
 
-# TODO: make to a grpc server?
+# TODO: refactor name
 class LoadBalancer():
     
     def __init__(self):
@@ -62,10 +62,4 @@ class LoadBalancer():
         request = SI_pb2.GetAllRequest(type=SI_pb2.ROUTER)
         responses = self.server_information_stub.get_all_(request)
         for i, response in enumerate(responses):
-            self._router_dict[response.ip_address] = response.name
-    
-    def get_router_list(self):
-        """
-        Returns the router_list
-        """
-        return self._router_dict
+            self._router_dict[response.name] = response.ip_address

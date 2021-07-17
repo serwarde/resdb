@@ -38,8 +38,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             self._dict_nodes[response.name] = response.ip_address
 
     # TODO: if we use multiple routers, we need to ensure that all of them have the same _dict_nodes, currently its gets only updated in the init.
+    # TODO: Serverinfomration send an update when a node gets added or delted
     # DONE: update the ServerInformation, since its updated, when a new node launches
     # TODO: rethink done above. We maybe should just do it in the add_node
+    # TODO: add paramerter so we can use this function to update the information in all nodes
     def add_node(self, request, context):
         """
         adds a new Node into the Router.

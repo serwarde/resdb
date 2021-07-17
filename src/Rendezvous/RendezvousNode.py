@@ -116,6 +116,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             else:
                 del self._objects_dict[key]
 
+    # TODO: delete update object since it is not needed
     def update_object(self, key, value):
         """
         not GRPC
