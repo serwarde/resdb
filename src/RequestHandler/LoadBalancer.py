@@ -1,7 +1,7 @@
 import grpc
 import random
-import src.ServerInformation.ServerInformation_pb2 as SI_pb2
-import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
+import src.NamingService.NamingService_pb2 as NS_pb2
+import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
 import src.Rendezvous.RendezvousHashing_pb2 as RH_pb2
 import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
@@ -13,7 +13,7 @@ class LoadBalancer():
     def __init__(self):
         # connect to Server inforamtion server
         channel = grpc.insecure_channel('localhost:50050')
-        self.server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
+        self.naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
 
         # DONE: use a dict inside for each router with the attributes name, ip_address, port
         self._router_dict = {}
@@ -56,10 +56,10 @@ class LoadBalancer():
     # DONE: save the routers locally
     def get_all_routers(self):
         """
-        Updated the list of all available routers from the ServerInformation
+        Updated the list of all available routers from the NamingService
         """
 
-        request = SI_pb2.GetAllRequest(type=SI_pb2.ROUTER)
-        responses = self.server_information_stub.get_all_(request)
+        request = NS_pb2.GetAllRequest(type=NS_pb2.ROUTER)
+        responses = self.naming_service_stub.get_all_(request)
         for i, response in enumerate(responses):
             self._router_dict[response.name] = response.ip_address

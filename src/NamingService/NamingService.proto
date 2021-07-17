@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-service ServerInformation {
+service NamingService {
     rpc add_ (AddRequest) returns (AddReply) {};
     rpc get_ (GetRequest) returns (GetReply) {}; 
     rpc get_random_ (GetRandomRequest) returns (GetRandomReply) {};

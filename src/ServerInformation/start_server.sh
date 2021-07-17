@@ -1,1 +1,0 @@
-python -m src.ServerInformation.ServerInformation -p $1

@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import src.ServerInformation.ServerInformation_pb2 as ServerInformation__pb2
+import src.NamingService.NamingService_pb2 as NamingService__pb2
 
 
-class ServerInformationStub(object):
+class NamingServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,38 +15,38 @@ class ServerInformationStub(object):
             channel: A grpc.Channel.
         """
         self.add_ = channel.unary_unary(
-                '/ServerInformation/add_',
-                request_serializer=ServerInformation__pb2.AddRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.AddReply.FromString,
+                '/NamingService/add_',
+                request_serializer=NamingService__pb2.AddRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.AddReply.FromString,
                 )
         self.get_ = channel.unary_unary(
-                '/ServerInformation/get_',
-                request_serializer=ServerInformation__pb2.GetRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.GetReply.FromString,
+                '/NamingService/get_',
+                request_serializer=NamingService__pb2.GetRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.GetReply.FromString,
                 )
         self.get_random_ = channel.unary_unary(
-                '/ServerInformation/get_random_',
-                request_serializer=ServerInformation__pb2.GetRandomRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.GetRandomReply.FromString,
+                '/NamingService/get_random_',
+                request_serializer=NamingService__pb2.GetRandomRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.GetRandomReply.FromString,
                 )
         self.get_all_ = channel.unary_stream(
-                '/ServerInformation/get_all_',
-                request_serializer=ServerInformation__pb2.GetAllRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.GetAllReply.FromString,
+                '/NamingService/get_all_',
+                request_serializer=NamingService__pb2.GetAllRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.GetAllReply.FromString,
                 )
         self.delete_ = channel.unary_unary(
-                '/ServerInformation/delete_',
-                request_serializer=ServerInformation__pb2.DeleteRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.DeleteReply.FromString,
+                '/NamingService/delete_',
+                request_serializer=NamingService__pb2.DeleteRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.DeleteReply.FromString,
                 )
         self.delete_all_ = channel.unary_unary(
-                '/ServerInformation/delete_all_',
-                request_serializer=ServerInformation__pb2.DeleteAllRequest.SerializeToString,
-                response_deserializer=ServerInformation__pb2.DeleteAllReply.FromString,
+                '/NamingService/delete_all_',
+                request_serializer=NamingService__pb2.DeleteAllRequest.SerializeToString,
+                response_deserializer=NamingService__pb2.DeleteAllReply.FromString,
                 )
 
 
-class ServerInformationServicer(object):
+class NamingServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def add_(self, request, context):
@@ -86,46 +86,46 @@ class ServerInformationServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ServerInformationServicer_to_server(servicer, server):
+def add_NamingServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'add_': grpc.unary_unary_rpc_method_handler(
                     servicer.add_,
-                    request_deserializer=ServerInformation__pb2.AddRequest.FromString,
-                    response_serializer=ServerInformation__pb2.AddReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.AddRequest.FromString,
+                    response_serializer=NamingService__pb2.AddReply.SerializeToString,
             ),
             'get_': grpc.unary_unary_rpc_method_handler(
                     servicer.get_,
-                    request_deserializer=ServerInformation__pb2.GetRequest.FromString,
-                    response_serializer=ServerInformation__pb2.GetReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.GetRequest.FromString,
+                    response_serializer=NamingService__pb2.GetReply.SerializeToString,
             ),
             'get_random_': grpc.unary_unary_rpc_method_handler(
                     servicer.get_random_,
-                    request_deserializer=ServerInformation__pb2.GetRandomRequest.FromString,
-                    response_serializer=ServerInformation__pb2.GetRandomReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.GetRandomRequest.FromString,
+                    response_serializer=NamingService__pb2.GetRandomReply.SerializeToString,
             ),
             'get_all_': grpc.unary_stream_rpc_method_handler(
                     servicer.get_all_,
-                    request_deserializer=ServerInformation__pb2.GetAllRequest.FromString,
-                    response_serializer=ServerInformation__pb2.GetAllReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.GetAllRequest.FromString,
+                    response_serializer=NamingService__pb2.GetAllReply.SerializeToString,
             ),
             'delete_': grpc.unary_unary_rpc_method_handler(
                     servicer.delete_,
-                    request_deserializer=ServerInformation__pb2.DeleteRequest.FromString,
-                    response_serializer=ServerInformation__pb2.DeleteReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.DeleteRequest.FromString,
+                    response_serializer=NamingService__pb2.DeleteReply.SerializeToString,
             ),
             'delete_all_': grpc.unary_unary_rpc_method_handler(
                     servicer.delete_all_,
-                    request_deserializer=ServerInformation__pb2.DeleteAllRequest.FromString,
-                    response_serializer=ServerInformation__pb2.DeleteAllReply.SerializeToString,
+                    request_deserializer=NamingService__pb2.DeleteAllRequest.FromString,
+                    response_serializer=NamingService__pb2.DeleteAllReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'ServerInformation', rpc_method_handlers)
+            'NamingService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class ServerInformation(object):
+class NamingService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -139,9 +139,9 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerInformation/add_',
-            ServerInformation__pb2.AddRequest.SerializeToString,
-            ServerInformation__pb2.AddReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/NamingService/add_',
+            NamingService__pb2.AddRequest.SerializeToString,
+            NamingService__pb2.AddReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -156,9 +156,9 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerInformation/get_',
-            ServerInformation__pb2.GetRequest.SerializeToString,
-            ServerInformation__pb2.GetReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/NamingService/get_',
+            NamingService__pb2.GetRequest.SerializeToString,
+            NamingService__pb2.GetReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -173,9 +173,9 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerInformation/get_random_',
-            ServerInformation__pb2.GetRandomRequest.SerializeToString,
-            ServerInformation__pb2.GetRandomReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/NamingService/get_random_',
+            NamingService__pb2.GetRandomRequest.SerializeToString,
+            NamingService__pb2.GetRandomReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -190,9 +190,9 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/ServerInformation/get_all_',
-            ServerInformation__pb2.GetAllRequest.SerializeToString,
-            ServerInformation__pb2.GetAllReply.FromString,
+        return grpc.experimental.unary_stream(request, target, '/NamingService/get_all_',
+            NamingService__pb2.GetAllRequest.SerializeToString,
+            NamingService__pb2.GetAllReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -207,9 +207,9 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerInformation/delete_',
-            ServerInformation__pb2.DeleteRequest.SerializeToString,
-            ServerInformation__pb2.DeleteReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/NamingService/delete_',
+            NamingService__pb2.DeleteRequest.SerializeToString,
+            NamingService__pb2.DeleteReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -224,8 +224,8 @@ class ServerInformation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerInformation/delete_all_',
-            ServerInformation__pb2.DeleteAllRequest.SerializeToString,
-            ServerInformation__pb2.DeleteAllReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/NamingService/delete_all_',
+            NamingService__pb2.DeleteAllRequest.SerializeToString,
+            NamingService__pb2.DeleteAllReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

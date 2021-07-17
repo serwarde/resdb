@@ -1,7 +1,7 @@
 FROM python:3.7.3-stretch
 ARG PORT
 COPY ./src /resdb/src
-COPY ./src/ServerInformation/start_server.sh /resdb
+COPY ./src/NamingService/start_server.sh /resdb
 WORKDIR "/resdb"
 RUN python -m pip install --upgrade pip
 RUN python -m pip install grpcio

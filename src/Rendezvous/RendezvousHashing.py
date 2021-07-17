@@ -1,8 +1,8 @@
 from src.Rendezvous.RendezvousNode import RendezvousNode
 from src.Routing.router_abstract import AbstractRouterClass
 
-import src.ServerInformation.ServerInformation_pb2 as SI_pb2
-import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
+import src.NamingService.NamingService_pb2 as NS_pb2
+import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
 
 import src.Rendezvous.RendezvousHashing_pb2 as RH_pb2
 import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
@@ -23,17 +23,17 @@ from concurrent import futures
 class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServicer):
     def __init__(self) -> None:
         channel = grpc.insecure_channel("172.17.0.2:50050")
-        self.server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
+        self.naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
         ## TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.get_all_nodes()
 
     def get_all_nodes(self):
         """
-        Updated the list of all available nodes from the ServerInformation
+        Updated the list of all available nodes from the NamingService
         """
-        request = SI_pb2.GetAllRequest(type=SI_pb2.NODE)
-        responses = self.server_information_stub.get_all_(request)
+        request = NS_pb2.GetAllRequest(type=NS_pb2.NODE)
+        responses = self.naming_service_stub.get_all_(request)
         for response in responses:
             self._dict_nodes[response.name] = response.ip_address
 
@@ -48,8 +48,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         node: the node that should be added
         """
         
-        request = SI_pb2.AddRequest(type=SI_pb2.NODE,name=request.name,ip_address=request.ip_address)
-        self.server_information_stub.add_(request)
+        request = NS_pb2.AddRequest(type=NS_pb2.NODE,name=request.name,ip_address=request.ip_address)
+        self.naming_service_stub.add_(request)
 
         self._dict_nodes[request.name] = request.ip_address
         self.redistribute_objects_to_new_node(request.ip_address)
@@ -74,7 +74,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
             node_stub.send_item_to_new_node(request)
 
-    # DONE: update the ServerInformation
+    # DONE: update the NamingService
     # TODO: remove_node not working
     def remove_node(self, request, context):
         """
@@ -85,8 +85,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
         # TODO: check if node with ip is in the list
 
-        request_sis = SI_pb2.DeleteRequest(type=SI_pb2.NODE, name=request.name)
-        self.server_information_stub.delete_(request_sis)
+        request_sis = NS_pb2.DeleteRequest(type=NS_pb2.NODE, name=request.name)
+        self.naming_service_stub.delete_(request_sis)
 
         del self._dict_nodes[request.name]
         
@@ -181,12 +181,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 def serve(name, ip_address, port):
     # connects to the server information and registers itself
     channel = grpc.insecure_channel("172.17.0.2:50050")
-    server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
+    naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
 
-    request = SI_pb2.AddRequest(
-        type=SI_pb2.ROUTER, name=name, ip_address=f"{ip_address}:{port}"
+    request = NS_pb2.AddRequest(
+        type=NS_pb2.ROUTER, name=name, ip_address=f"{ip_address}:{port}"
     )
-    _ = server_information_stub.add_(request)
+    _ = naming_service_stub.add_(request)
 
     # starts the grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

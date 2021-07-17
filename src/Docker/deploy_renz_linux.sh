@@ -3,13 +3,13 @@
 # start script in src/docker
 cd ../../
 
-# deletes the ServerInformation
+# deletes the NamingService
 printf '%.s-' {1..100}
-printf " deletes ServerInformation Server "
+printf " deletes NamingService Server "
 printf '%.s-' {1..100}; echo "" 
-docker stop serverInformation
-docker rm serverInformation
-docker rmi serverinformation
+docker stop namingService
+docker rm namingService
+docker rmi namingservice
 
 # deletes a router
 printf '%.s-' {1..100}
@@ -33,12 +33,12 @@ docker rmi rendezvousnode0
 docker rmi rendezvousnode1
 docker rmi rendezvousnode2
 
-#starts the serverinformation
+#starts the namingservice
 printf '%.s-' {1..100}
-printf " creates and starts ServerInformation Server "
+printf " creates and starts NamingService Server "
 printf '%.s-' {1..100}; echo ""
-docker build -t serverinformation -f src/Docker/Dockerfile_ServerInformation --build-arg PORT=50050 .
-docker run -d -it --name serverInformation -p 50050:50050 serverinformation:latest 50050
+docker build -t namingservice -f src/Docker/Dockerfile_NamingService --build-arg PORT=50050 .
+docker run -d -it --name namingService -p 50050:50050 namingservice:latest 50050
 
 # starts a router
 printf '%.s-' {1..100}

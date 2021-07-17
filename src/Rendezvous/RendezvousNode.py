@@ -8,8 +8,6 @@ import argparse
 
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
 import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
-import src.ServerInformation.ServerInformation_pb2 as SI_pb2
-import src.ServerInformation.ServerInformation_pb2_grpc as SI_pb2_grpc
 
 import src.Rendezvous.type_pb2 as type_pb2
 
@@ -163,7 +161,6 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         
 
 def serve(name, ip_address, port, weight):
-
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RN_pb2_grpc.add_RendezvousNodeServicer_to_server(RendezvousNode(name, ip_address, port, weight), server)
     server.add_insecure_port(f'{ip_address}:{port}')
