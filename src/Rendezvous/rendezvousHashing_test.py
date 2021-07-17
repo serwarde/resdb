@@ -102,12 +102,15 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.router_stub.remove_node(request)
         self.tst_value_for_key("Nico",["14"],1)
         self.tst_value_for_key("bob1",["14"],1)
+        self.tst_value_for_key("Nico",[],2)
 
         request = RH_pb2.RendezvousInformation(name="node1",ip_address="172.17.0.5:50252")
         self.router_stub.remove_node(request)
         self.tst_value_for_key("Sam",["14"])
         self.tst_value_for_key("Nico",["14"])
         self.tst_value_for_key("bob1",["14"])
+        self.tst_value_for_key("bob1",[],1)
+        self.tst_value_for_key("Nico",[],1)
 
     def tst_value_for_key(self, key, values, stub=0):
 

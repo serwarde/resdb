@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"Z\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x12\n\x05value\x18\x03 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_value\",\n\x0cNodeGetReply\x12\x12\n\x05value\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_value\"M\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05value\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x06\n\x04_keyB\x08\n\x06_value\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\x88\x02\n\x0eRendezvousNode\x12\x31\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x30\x01\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"Z\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x12\n\x05value\x18\x03 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_value\",\n\x0cNodeGetReply\x12\x12\n\x05value\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_value\"M\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05value\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x06\n\x04_keyB\x08\n\x06_value\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\xae\x02\n\x0eRendezvousNode\x12\x31\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x30\x01\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x12$\n\nremove_all\x12\n.NodeEmpty\x1a\n.NodeEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -365,7 +365,7 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=403,
-  serialized_end=667,
+  serialized_end=705,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_request',
@@ -403,6 +403,16 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
     index=3,
     containing_service=None,
     input_type=_NODESENDITEMTONEWNODEREQUEST,
+    output_type=_NODEEMPTY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='remove_all',
+    full_name='RendezvousNode.remove_all',
+    index=4,
+    containing_service=None,
+    input_type=_NODEEMPTY,
     output_type=_NODEEMPTY,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,

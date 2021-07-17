@@ -103,9 +103,9 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
         objects_on_node = defaultdict(list)
         channel = grpc.insecure_channel(ip_address)
-        node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+        node_stub_del = RN_pb2_grpc.RendezvousNodeStub(channel)
         request = RN_pb2.NodeEmpty()
-        responses = node_stub.get_objects(request)
+        responses = node_stub_del.get_objects(request)
 
         print("started the channel")
 
@@ -128,6 +128,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                     pass
 
         objects_on_node.clear()
+        node_stub_del.remove_all(RN_pb2.NodeEmpty())
 
 
     # DONE: the request gets forwarded directly from the router after finding the responsible node
@@ -179,15 +180,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         return champion_ip 
 
 def serve(name, ip_address, port):
-    # connects to the server information and registers itself
-    channel = grpc.insecure_channel("172.17.0.2:50050")
-    naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
-
-    request = NS_pb2.AddRequest(
-        type=NS_pb2.ROUTER, name=name, ip_address=f"{ip_address}:{port}"
-    )
-    _ = naming_service_stub.add_(request)
-
     # starts the grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RH_pb2_grpc.add_RendezvousHashingServicer_to_server(RendezvousHashing(), server)

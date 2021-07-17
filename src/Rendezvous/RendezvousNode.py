@@ -134,6 +134,11 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         for key, values in self._objects_dict.copy().items():
             for value in values:
                 yield RN_pb2.NodeGetObjectsReply(key=key, value=value)
+
+    def remove_all(self, request, context):
+        self._objects_dict.clear()
+        return RN_pb2.NodeEmpty()
+          
     
     def get_request(self, request, context):
         """

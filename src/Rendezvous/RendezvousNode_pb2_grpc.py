@@ -34,6 +34,11 @@ class RendezvousNodeStub(object):
                 request_serializer=RendezvousNode__pb2.NodeSendItemToNewNodeRequest.SerializeToString,
                 response_deserializer=RendezvousNode__pb2.NodeEmpty.FromString,
                 )
+        self.remove_all = channel.unary_unary(
+                '/RendezvousNode/remove_all',
+                request_serializer=RendezvousNode__pb2.NodeEmpty.SerializeToString,
+                response_deserializer=RendezvousNode__pb2.NodeEmpty.FromString,
+                )
 
 
 class RendezvousNodeServicer(object):
@@ -63,6 +68,12 @@ class RendezvousNodeServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def remove_all(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RendezvousNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -84,6 +95,11 @@ def add_RendezvousNodeServicer_to_server(servicer, server):
             'send_item_to_new_node': grpc.unary_unary_rpc_method_handler(
                     servicer.send_item_to_new_node,
                     request_deserializer=RendezvousNode__pb2.NodeSendItemToNewNodeRequest.FromString,
+                    response_serializer=RendezvousNode__pb2.NodeEmpty.SerializeToString,
+            ),
+            'remove_all': grpc.unary_unary_rpc_method_handler(
+                    servicer.remove_all,
+                    request_deserializer=RendezvousNode__pb2.NodeEmpty.FromString,
                     response_serializer=RendezvousNode__pb2.NodeEmpty.SerializeToString,
             ),
     }
@@ -160,6 +176,23 @@ class RendezvousNode(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousNode/send_item_to_new_node',
             RendezvousNode__pb2.NodeSendItemToNewNodeRequest.SerializeToString,
+            RendezvousNode__pb2.NodeEmpty.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def remove_all(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RendezvousNode/remove_all',
+            RendezvousNode__pb2.NodeEmpty.SerializeToString,
             RendezvousNode__pb2.NodeEmpty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
