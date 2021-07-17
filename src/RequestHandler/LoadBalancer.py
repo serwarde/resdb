@@ -7,7 +7,7 @@ import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
 import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
 import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
 
-# TODO: refactor name
+# DONE: refactor name
 class LoadBalancer():
     
     def __init__(self):
