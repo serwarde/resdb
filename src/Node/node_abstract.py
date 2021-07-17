@@ -60,19 +60,6 @@ class AbstractNodeClass(metaclass=ABCMeta):
         pass
     
     @abstractmethod
-    def update_object(self, key, value):
-        """
-        updates a object in the dict, 
-        if a dict, list or tuple is used we append the value/s to the key
-        
-        TODO: What happens if the key is not in the list / the value/s are already in the list/...
-        
-        key = the key from the object
-        value = value of the key
-        """
-        pass
-    
-    @abstractmethod
     def get_object(self, key) -> Union[int,str,list,bool,tuple,dict]:
         """
         returns the values for a given key
@@ -101,6 +88,4 @@ class AbstractNodeClass(metaclass=ABCMeta):
             self.remove_object(key,value)
         elif type == "get":
             self.get_object(key)
-        elif type == "update":
-            self.update_object(key,value)
             

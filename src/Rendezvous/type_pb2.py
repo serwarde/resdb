@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\ntype.proto*:\n\x0eGetRequestType\x12\x07\n\x03\x41\x44\x44\x10\x00\x12\n\n\x06UPDATE\x10\x01\x12\x07\n\x03GET\x10\x02\x12\n\n\x06\x44\x45LETE\x10\x03\x62\x06proto3'
+  serialized_pb=b'\n\ntype.proto*.\n\x0eGetRequestType\x12\x07\n\x03\x41\x44\x44\x10\x00\x12\x07\n\x03GET\x10\x01\x12\n\n\x06\x44\x45LETE\x10\x02\x62\x06proto3'
 )
 
 _GETREQUESTTYPE = _descriptor.EnumDescriptor(
@@ -36,17 +36,12 @@ _GETREQUESTTYPE = _descriptor.EnumDescriptor(
       type=None,
       create_key=_descriptor._internal_create_key),
     _descriptor.EnumValueDescriptor(
-      name='UPDATE', index=1, number=1,
+      name='GET', index=1, number=1,
       serialized_options=None,
       type=None,
       create_key=_descriptor._internal_create_key),
     _descriptor.EnumValueDescriptor(
-      name='GET', index=2, number=2,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='DELETE', index=3, number=3,
+      name='DELETE', index=2, number=2,
       serialized_options=None,
       type=None,
       create_key=_descriptor._internal_create_key),
@@ -54,15 +49,14 @@ _GETREQUESTTYPE = _descriptor.EnumDescriptor(
   containing_type=None,
   serialized_options=None,
   serialized_start=14,
-  serialized_end=72,
+  serialized_end=60,
 )
 _sym_db.RegisterEnumDescriptor(_GETREQUESTTYPE)
 
 GetRequestType = enum_type_wrapper.EnumTypeWrapper(_GETREQUESTTYPE)
 ADD = 0
-UPDATE = 1
-GET = 2
-DELETE = 3
+GET = 1
+DELETE = 2
 
 
 DESCRIPTOR.enum_types_by_name['GetRequestType'] = _GETREQUESTTYPE

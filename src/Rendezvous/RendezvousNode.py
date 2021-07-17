@@ -116,19 +116,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             else:
                 del self._objects_dict[key]
 
-    # TODO: delete update object since it is not needed
-    def update_object(self, key, value):
-        """
-        not GRPC
-
-        updates a object in the dict, 
-        if a dict, list or tuple is used we append the value/s to the key
-        key = the key from the object
-        value = value of the key
-
-        TODO: Check if necessary if we keep using lists as values in the defaultdict
-        """
-        self._objects_dict[key].append(value)
+    # DONE: delete update object since it is not needed
     
     def get_object(self, key) -> Union[int,str,list,bool,tuple,dict]:
         """
@@ -165,12 +153,9 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             self.add_object(request.key,request.value)
             return RN_pb2.NodeGetReply()
         elif request.type == 1:
-            self.update_object(request.key,request.value)
-            return RN_pb2.NodeGetReply()
-        elif request.type == 2:
             for value in self.get_object(request.key):
                 yield RN_pb2.NodeGetReply(value=value)
-        elif request.type == 3:
+        elif request.type == 2:
             self.remove_object(request.key,request.value)
             return RN_pb2.NodeGetReply()
         
