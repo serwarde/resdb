@@ -163,11 +163,6 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         
 
 def serve(name, ip_address, port, weight):
-    channel = grpc.insecure_channel('172.17.0.2:50050')
-    server_information_stub = SI_pb2_grpc.ServerInformationStub(channel)
-    request = SI_pb2.AddRequest(type=SI_pb2.NODE,name=name,ip_address=f'{ip_address}:{port}')
-    _ = server_information_stub.add_(request)
-
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RN_pb2_grpc.add_RendezvousNodeServicer_to_server(RendezvousNode(name, ip_address, port, weight), server)

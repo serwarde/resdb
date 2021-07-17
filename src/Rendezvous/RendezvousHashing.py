@@ -39,9 +39,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
     # TODO: if we use multiple routers, we need to ensure that all of them have the same _dict_nodes, currently its gets only updated in the init.
     # TODO: Serverinfomration send an update when a node gets added or deleted
-    # DONE: update the ServerInformation, since its updated, when a new node launches
-    # TODO: rethink done above. We maybe should just do it in the add_node
-    # TODO: add paramerter so we can use this function to update the information in all nodes
+    # TODO: add paramerter so we can use this function to update the information in all routers
     def add_node(self, request, context):
         """
         adds a new Node into the Router.
@@ -49,9 +47,13 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be added
         """
-        print(self._dict_nodes)
+        
+        request = SI_pb2.AddRequest(type=SI_pb2.NODE,name=request.name,ip_address=request.ip_address)
+        self.server_information_stub.add_(request)
+
         self._dict_nodes[request.name] = request.ip_address
         self.redistribute_objects_to_new_node(request.ip_address)
+
         return RH_pb2.RendezvousEmpty()
 
     def redistribute_objects_to_new_node(self, ip_address):
