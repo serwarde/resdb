@@ -32,15 +32,10 @@ docker rmi rendezvoushashing0
 printf '%.s-' {1..100}
 printf " deltes Node Servers "
 printf '%.s-' {1..100}; echo ""
-docker stop rendezvousNode0
-docker stop rendezvousNode1
-docker stop rendezvousNode2
-docker rm rendezvousNode0
-docker rm rendezvousNode1
-docker rm rendezvousNode2
-docker rmi rendezvousnode0
-docker rmi rendezvousnode1
-docker rmi rendezvousnode2
+docker stop rendezvousNode0 rendezvousNode1 rendezvousNode2 
+docker rm rendezvousNode0 rendezvousNode1 rendezvousNode2
+docker rmi rendezvousnode0 rendezvousnode1 rendezvousnode2
+
 
 #starts the namingservice
 printf '%.s-' {1..100}
