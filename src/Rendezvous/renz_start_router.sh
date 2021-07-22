@@ -1,1 +1,0 @@
-python -m src.Rendezvous.RendezvousHashing -n $1 -p $2

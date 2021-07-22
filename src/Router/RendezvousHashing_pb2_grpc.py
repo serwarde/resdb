@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import src.Rendezvous.RendezvousHashing_pb2 as RendezvousHashing__pb2
+import src.Router.RendezvousHashing_pb2 as RendezvousHashing__pb2
 
 
 class RendezvousHashingStub(object):

@@ -6,10 +6,10 @@ import hashlib
 import socket
 import argparse
 
-import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
-import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
+import src.Node.RendezvousNode_pb2 as RN_pb2
+import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
 
-import src.Rendezvous.type_pb2 as type_pb2
+import src.grpc_enums.type_pb2 as type_pb2
 
 import grpc
 from concurrent import futures

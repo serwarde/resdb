@@ -2,10 +2,10 @@ import grpc
 import random
 import src.NamingService.NamingService_pb2 as NS_pb2
 import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
-import src.Rendezvous.RendezvousHashing_pb2 as RH_pb2
-import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
-import src.Rendezvous.RendezvousNode_pb2 as RN_pb2
-import src.Rendezvous.RendezvousNode_pb2_grpc as RN_pb2_grpc
+import src.Router.RendezvousHashing_pb2 as RH_pb2
+import src.Router.RendezvousHashing_pb2_grpc as RH_pb2_grpc
+import src.Node.RendezvousNode_pb2 as RN_pb2
+import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
 
 # TODO: if LB is not grpc we need to use localhost instead of the ip
 class LoadBalancer():

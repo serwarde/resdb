@@ -1,5 +1,5 @@
 from ConsistentHash.ConsistentNode import ConsistentNode
-from Routing.router_abstract import AbstractRouterClass
+from Router.router_abstract import AbstractRouterClass
 import hashlib
 
 

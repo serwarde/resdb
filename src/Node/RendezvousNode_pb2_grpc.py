@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import src.Rendezvous.RendezvousNode_pb2 as RendezvousNode__pb2
+import src.Node.RendezvousNode_pb2 as RendezvousNode__pb2
 
 
 class RendezvousNodeStub(object):

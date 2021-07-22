@@ -7,8 +7,8 @@ import argparse
 import src.NamingService.NamingService_pb2 as NamingService_pb2
 import src.NamingService.NamingService_pb2_grpc as NamingService_pb2_grpc
 
-import src.Rendezvous.RendezvousHashing_pb2 as RH_pb2
-import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
+import src.Router.RendezvousHashing_pb2 as RH_pb2
+import src.Router.RendezvousHashing_pb2_grpc as RH_pb2_grpc
 
 class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
     lb_information = {}
