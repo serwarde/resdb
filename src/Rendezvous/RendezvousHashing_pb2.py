@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"V\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xd1\x01\n\x11RendezvousHashing\x12M\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x10.RendezvousEmpty\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
+  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"V\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xc2\x02\n\x11RendezvousHashing\x12M\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x10.RendezvousEmpty\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x35\n\t_add_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x38\n\x0c_remove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -173,7 +173,7 @@ _RENDEZVOUSHASHING = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=206,
-  serialized_end=415,
+  serialized_end=528,
   methods=[
   _descriptor.MethodDescriptor(
     name='forward_to_responsible_node',
@@ -199,6 +199,26 @@ _RENDEZVOUSHASHING = _descriptor.ServiceDescriptor(
     name='remove_node',
     full_name='RendezvousHashing.remove_node',
     index=2,
+    containing_service=None,
+    input_type=_RENDEZVOUSINFORMATION,
+    output_type=_RENDEZVOUSEMPTY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='_add_node',
+    full_name='RendezvousHashing._add_node',
+    index=3,
+    containing_service=None,
+    input_type=_RENDEZVOUSINFORMATION,
+    output_type=_RENDEZVOUSEMPTY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='_remove_node',
+    full_name='RendezvousHashing._remove_node',
+    index=4,
     containing_service=None,
     input_type=_RENDEZVOUSINFORMATION,
     output_type=_RENDEZVOUSEMPTY,

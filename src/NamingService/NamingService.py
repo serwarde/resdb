@@ -7,20 +7,41 @@ import argparse
 import src.NamingService.NamingService_pb2 as NamingService_pb2
 import src.NamingService.NamingService_pb2_grpc as NamingService_pb2_grpc
 
+import src.Rendezvous.RendezvousHashing_pb2 as RH_pb2
+import src.Rendezvous.RendezvousHashing_pb2_grpc as RH_pb2_grpc
+
 class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
     lb_information = {}
     router_information = {}
     node_information = {}
 
     def add_(self, request, context):
+        """
+        adds a entry into the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False and request.name not in dict:
             dict[request.name] = request.ip_address
+            
+            # if we add a new node send update to each router
+            if request.type == 2:
+                for router_ip in self.router_information.copy().values():
+                    channel = grpc.insecure_channel(router_ip)
+                    router_stup = RH_pb2_grpc.RendezvousHashingStub(channel)
+                    request = RH_pb2.RendezvousInformation(name=request.name,ip_address=request.ip_address) 
+                    router_stup._add_node(request)
+
             return NamingService_pb2.AddReply(message="Add was successfull")
+
         return NamingService_pb2.AddReply(message="Add was not successfull")
     
     def get_(self, request, context):
+        """
+        return a entry from the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False and request.name in dict:
@@ -28,6 +49,10 @@ class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
         return NamingService_pb2.GetReply(message="No IP-Address for this Name found")
 
     def get_random_(self, request, context):
+        """
+        return a random entry from the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False:
@@ -36,6 +61,10 @@ class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
         return NamingService_pb2.GetRandomReply(message="No IP-Addresses are saved")
 
     def get_all_(self, request, context):
+        """
+        return all entries from the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False:
@@ -46,14 +75,31 @@ class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
 
 
     def delete_(self, request, context):
+        """
+        deletes a entry from the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False and request.name in dict:
             del dict[request.name]
+
+            # if we delete a new node send update to each router
+            if request.type == 2:
+                for router_ip in self.router_information.copy().values():
+                    channel = grpc.insecure_channel(router_ip)
+                    router_stup = RH_pb2_grpc.RendezvousHashingStub(channel)
+                    request = RH_pb2.RendezvousInformation(name=request.name) 
+                    router_stup._remove_node(request)
+
             return NamingService_pb2.DeleteReply(message="Delete was successfull")
         return NamingService_pb2.DeleteReply(message="Delete was not successfull")
 
     def delete_all_(self, request, context):
+        """
+        deletes all entries from the corresponding dict
+        """
+
         dict = self.get_dict(request.type)
 
         if dict is not False:
@@ -63,6 +109,10 @@ class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
 
 
     def get_dict(self, RequestType):
+        """
+        returns the correct dictonary bases on the RequestType
+        """
+
         if RequestType == 0:
             return self.lb_information
         elif RequestType == 1:

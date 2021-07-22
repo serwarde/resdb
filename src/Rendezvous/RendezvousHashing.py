@@ -26,9 +26,9 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         self.naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
         ## TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
-        self.get_all_nodes()
+        self.set_nodes()
 
-    def get_all_nodes(self):
+    def set_nodes(self):
         """
         Updated the list of all available nodes from the NamingService
         """
@@ -36,6 +36,16 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         responses = self.naming_service_stub.get_all_(request)
         for response in responses:
             self._dict_nodes[response.name] = response.ip_address
+
+    def _add_node(self, request, context):
+        """
+        should only be called by the NamingService
+
+        it adds the node into the local dictonary
+        """
+
+        self._dict_nodes[request.name] = request.ip_address
+        return RH_pb2.RendezvousEmpty()
 
     # TODO: if we use multiple routers, we need to ensure that all of them have the same _dict_nodes, currently its gets only updated in the init.
     # TODO: Serverinfomration send an update when a node gets added or deleted
@@ -51,7 +61,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         request = NS_pb2.AddRequest(type=NS_pb2.NODE,name=request.name,ip_address=request.ip_address)
         self.naming_service_stub.add_(request)
 
-        self._dict_nodes[request.name] = request.ip_address
         self.redistribute_objects_to_new_node(request.ip_address)
 
         return RH_pb2.RendezvousEmpty()
@@ -74,8 +83,17 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
             node_stub.send_item_to_new_node(request)
 
-    # DONE: update the NamingService
-    # TODO: remove_node not working
+    def _remove_node(self, request, context):
+        """
+        should only be called by the NamingService
+
+        it removes the node from the local dictonary
+        """
+
+        del self._dict_nodes[request.name]
+        return RH_pb2.RendezvousEmpty()
+
+
     def remove_node(self, request, context):
         """
         removes a Node from the Router.
@@ -87,14 +105,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         request_sis = NS_pb2.DeleteRequest(type=NS_pb2.NODE, name=request.name)
         self.naming_service_stub.delete_(request_sis)
-
-        del self._dict_nodes[request.name]
         
         self.redistribute_objects_from_deleted_node(request.ip_address)
         return RH_pb2.RendezvousEmpty()
 
-    # TODO: it is not done, since it cant call the function on the node. Also the call was wrong
-    # DONE: can we call the forward_to_responsible_node function if we dont use rpc?
     def redistribute_objects_from_deleted_node(self, ip_address):
         """
         Redistributes all Key,Values of a deleted Node
@@ -113,7 +127,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         for response in responses:
             objects_on_node[response.key].append(response.value)
 
-        # TODO: This solution is probably not efficient, but I'm not sure whether it's a design or programming issue. 
+        # TODO: This solution is not efficient, we should use the node for this
+        # , but I'm not sure whether it's a design or programming issue. 
         for key, vs in objects_on_node.items():
             champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items())
             

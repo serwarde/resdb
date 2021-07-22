@@ -5,6 +5,8 @@ service RendezvousHashing {
     rpc forward_to_responsible_node (RendezvousFindNodeRequest) returns (RendezvousEmpty) {};
     rpc add_node (RendezvousInformation) returns (RendezvousEmpty);
     rpc remove_node (RendezvousInformation) returns (RendezvousEmpty);
+    rpc _add_node (RendezvousInformation) returns (RendezvousEmpty);
+    rpc _remove_node (RendezvousInformation) returns (RendezvousEmpty);
 }
 
 message RendezvousFindNodeRequest {

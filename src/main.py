@@ -44,7 +44,7 @@ def show_all_responses():
 
 # adds a router to the list
 # router needs to run already in the docker container
-lb.add_router("router0","localhost","50151")
+lb.add_router("router0","172.17.0.3","50151")
 
 # adds a node
 # node needs to run already in the docker container

@@ -81,11 +81,12 @@ class LoadBalancer():
         request = RH_pb2.RendezvousInformation(name=name, ip_address=f"{ip_address}:{port}")
         router_stub.remove_node(request)
 
-    def add_router(self, name, ip_address, port):
+    # Local ip is needed as long the LB is not inside a docker container
+    def add_router(self, name, ip_address, port, local_ip="localhost"):
         request_ns = NS_pb2.AddRequest(type=NS_pb2.ROUTER, name=name, ip_address=f"{ip_address}:{port}")
         self.naming_service_stub.add_(request_ns)
 
-        self._router_dict[name] = f"{ip_address}:{port}"
+        self._router_dict[name] = f"{local_ip}:{port}"
 
     def remove_router(self, name, port):
         request_ns = NS_pb2.DeleteRequest(type=NS_pb2.ROUTER, name=name)
