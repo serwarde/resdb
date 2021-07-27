@@ -44,7 +44,6 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         multplied by the node weight
         """
         hash = self._hashing((key+self._host_ip).encode('utf-8')).hexdigest()
-        final_hash = float.fromhex(hash) * self._node_weight
         return float.fromhex(hash) * self._node_weight
 
     # Done: implement as a GRPC function. Since it needs to connect to the other node.
@@ -177,7 +176,6 @@ def serve(name, ip_address, port, weight):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create Rendezvous Node.')
-    parser.add_argument('--name', '-n', type=str, help='The name of the Node', default="node1")
     parser.add_argument('--port', '-p', type=int, help='The port of the Node', default=50251)
     parser.add_argument('--weight', '-w', type=float, help='The weight of the Node', default=1.0)
     args = parser.parse_args()
@@ -185,5 +183,5 @@ if __name__ == '__main__':
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     
-    print(f"starting Node '{args.name}': {ip_address}:{args.port} with {args.weight}.")
+    print(f"starting Node: {ip_address}:{args.port} with {args.weight}.")
     serve(args.name, ip_address, args.port, args.weight)

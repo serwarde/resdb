@@ -194,7 +194,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         
         return champion_ip 
 
-def serve(name, ip_address, port):
+def serve(ip_address, port):
     # starts the grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     RH_pb2_grpc.add_RendezvousHashingServicer_to_server(RendezvousHashing(), server)
@@ -209,12 +209,11 @@ def serve(name, ip_address, port):
 if __name__ == "__main__":
     # arguments
     parser = argparse.ArgumentParser(description='Create Rendezvous Router.')
-    parser.add_argument('--name', '-n', type=str, help='The name of the Router', default="router1")
     parser.add_argument('--port', '-p', type=int, help='The port of the Router', default=50151)
     args = parser.parse_args()
     
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     
-    print(f"starting Router '{args.name}': {ip_address}:{args.port}.")
-    serve(args.name, ip_address, args.port)
+    print(f"starting Router: {ip_address}:{args.port}.")
+    serve(ip_address, args.port)

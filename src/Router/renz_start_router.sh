@@ -1,1 +1,1 @@
-python -m src.Router.RendezvousHashing -n $1 -p $2
+python -m src.Router.RendezvousHashing -p $1
