@@ -50,7 +50,7 @@ class LoadBalancer():
 
         random_router = random.choice(list(self._router_dict.values()))
         channel = grpc.insecure_channel(random_router)
-
+        print(random_router)
         return RH_pb2_grpc.RendezvousHashingStub(channel)
 
 
