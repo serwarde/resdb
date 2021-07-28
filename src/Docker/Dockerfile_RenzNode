@@ -1,12 +1,6 @@
-FROM python:3.7.3-stretch
+FROM rendezvousbase:latest
 ARG PORT
-COPY ./src /resdb/src
 COPY ./src/Node/renz_start_node.sh /resdb
 WORKDIR "/resdb"
-RUN python -m pip install --upgrade pip
-RUN python -m pip install grpcio
-Run python -m pip install google-cloud
-Run python -m pip install google-cloud-vision
-Run python -m pip install better-abc
 EXPOSE $PORT
 ENTRYPOINT ["/bin/bash", "renz_start_node.sh"]

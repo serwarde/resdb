@@ -12,6 +12,9 @@ netsh int ipv4 add excludedportrange protocol=tcp startport=50252 numberofports=
 netsh int ipv4 add excludedportrange protocol=tcp startport=50253 numberofports=1
 net start winnat
 
+# deletes base image
+docker rmi rendezvousbase
+
 # deletes the NamingService
 printf '%.s-' {1..100}
 printf " deletes NamingService Server "
@@ -39,6 +42,8 @@ docker stop rendezvousNode0 rendezvousNode1 rendezvousNode2
 docker rm rendezvousNode0 rendezvousNode1 rendezvousNode2
 docker rmi rendezvousnode0 rendezvousnode1 rendezvousnode2
 
+# build a base image
+docker build -t rendezvousbase -f src/Docker/Dockerfile .
 
 #starts the namingservice
 printf '%.s-' {1..100}
