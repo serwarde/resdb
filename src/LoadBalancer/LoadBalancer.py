@@ -40,7 +40,8 @@ class LoadBalancer():
         request = RH_pb2.RendezvousFindNodeRequest(type=type, key=key, value=value)
         response = router_stub.forward_to_responsible_node(request)
 
-        print(response)  
+        if type == 1:
+            return response
     
     def get_random_router(self):
         """
@@ -54,7 +55,6 @@ class LoadBalancer():
         return RH_pb2_grpc.RendezvousHashingStub(channel)
 
 
-    # DONE: save the routers locally
     def get_all_routers(self):
         """
         Updated the list of all available routers from the NamingService
@@ -88,7 +88,7 @@ class LoadBalancer():
 
         self._router_dict[name] = f"{local_ip}:{port}"
 
-    def remove_router(self, name, port):
+    def remove_router(self, name):
         request_ns = NS_pb2.DeleteRequest(type=NS_pb2.ROUTER, name=name)
         self.naming_service_stub.delete_(request_ns)
 

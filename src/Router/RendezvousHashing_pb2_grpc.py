@@ -17,7 +17,7 @@ class RendezvousHashingStub(object):
         self.forward_to_responsible_node = channel.unary_unary(
                 '/RendezvousHashing/forward_to_responsible_node',
                 request_serializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-                response_deserializer=RendezvousHashing__pb2.RendezvousEmpty.FromString,
+                response_deserializer=RendezvousHashing__pb2.RendezvousFindNodeResponse.FromString,
                 )
         self.add_node = channel.unary_unary(
                 '/RendezvousHashing/add_node',
@@ -80,7 +80,7 @@ def add_RendezvousHashingServicer_to_server(servicer, server):
             'forward_to_responsible_node': grpc.unary_unary_rpc_method_handler(
                     servicer.forward_to_responsible_node,
                     request_deserializer=RendezvousHashing__pb2.RendezvousFindNodeRequest.FromString,
-                    response_serializer=RendezvousHashing__pb2.RendezvousEmpty.SerializeToString,
+                    response_serializer=RendezvousHashing__pb2.RendezvousFindNodeResponse.SerializeToString,
             ),
             'add_node': grpc.unary_unary_rpc_method_handler(
                     servicer.add_node,
@@ -125,7 +125,7 @@ class RendezvousHashing(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RendezvousHashing/forward_to_responsible_node',
             RendezvousHashing__pb2.RendezvousFindNodeRequest.SerializeToString,
-            RendezvousHashing__pb2.RendezvousEmpty.FromString,
+            RendezvousHashing__pb2.RendezvousFindNodeResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

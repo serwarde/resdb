@@ -27,7 +27,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         ## TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.set_nodes()
-        self.replica = 2
+        self.replica = 1
 
     def set_nodes(self):
         """
@@ -130,7 +130,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # , but I'm not sure whether it's a design or programming issue. 
         # TODO: currently not replicas are used
         for key, vs in objects_on_node.items():
-            champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items())[0]
+            champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items(), self.replica)[0]
             
             channel = grpc.insecure_channel(champion_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
@@ -154,8 +154,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         return the Node for the given key
         """
 
-        ip_from_champions = self.find_responsible_node(request.key, self._dict_nodes.copy().items())
-       
+        ip_from_champions = self.find_responsible_node(request.key, self._dict_nodes.copy().items(), self.replica)
+
+        # TODO: anders machen
+        if request.type == 1:
+            ip_from_champions = ip_from_champions[:1]
+
         champion = True
 
         for ip in ip_from_champions:
@@ -170,11 +174,17 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                 request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=True)
             
             # sends the request to the node
-            node_stub.get_request(request)
+            response = node_stub.get_request(request)
 
-        return RH_pb2.RendezvousEmpty()
+        if request.type != 1:
+            return RH_pb2.RendezvousFindNodeResponse()
 
-    def find_responsible_node(self, key, dict_nodes_items, replica=1):
+        else:
+            fnd = RH_pb2.RendezvousFindNodeResponse()
+            fnd.values[:] = list(response.values)
+            return fnd
+
+    def find_responsible_node(self, key, dict_nodes_items, replica):
         dict = {}
 
         # TODO: threading

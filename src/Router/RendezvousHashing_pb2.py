@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"V\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xc2\x02\n\x11RendezvousHashing\x12M\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x10.RendezvousEmpty\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x35\n\t_add_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x38\n\x0c_remove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
+  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"V\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\",\n\x1aRendezvousFindNodeResponse\x12\x0e\n\x06values\x18\x01 \x03(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xcd\x02\n\x11RendezvousHashing\x12X\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x1b.RendezvousFindNodeResponse\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x35\n\t_add_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x38\n\x0c_remove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -73,6 +73,38 @@ _RENDEZVOUSFINDNODEREQUEST = _descriptor.Descriptor(
 )
 
 
+_RENDEZVOUSFINDNODERESPONSE = _descriptor.Descriptor(
+  name='RendezvousFindNodeResponse',
+  full_name='RendezvousFindNodeResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='values', full_name='RendezvousFindNodeResponse.values', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=127,
+  serialized_end=171,
+)
+
+
 _RENDEZVOUSINFORMATION = _descriptor.Descriptor(
   name='RendezvousInformation',
   full_name='RendezvousInformation',
@@ -107,8 +139,8 @@ _RENDEZVOUSINFORMATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=127,
-  serialized_end=184,
+  serialized_start=173,
+  serialized_end=230,
 )
 
 
@@ -132,12 +164,13 @@ _RENDEZVOUSEMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=186,
-  serialized_end=203,
+  serialized_start=232,
+  serialized_end=249,
 )
 
 _RENDEZVOUSFINDNODEREQUEST.fields_by_name['type'].enum_type = type__pb2._GETREQUESTTYPE
 DESCRIPTOR.message_types_by_name['RendezvousFindNodeRequest'] = _RENDEZVOUSFINDNODEREQUEST
+DESCRIPTOR.message_types_by_name['RendezvousFindNodeResponse'] = _RENDEZVOUSFINDNODERESPONSE
 DESCRIPTOR.message_types_by_name['RendezvousInformation'] = _RENDEZVOUSINFORMATION
 DESCRIPTOR.message_types_by_name['RendezvousEmpty'] = _RENDEZVOUSEMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -148,6 +181,13 @@ RendezvousFindNodeRequest = _reflection.GeneratedProtocolMessageType('Rendezvous
   # @@protoc_insertion_point(class_scope:RendezvousFindNodeRequest)
   })
 _sym_db.RegisterMessage(RendezvousFindNodeRequest)
+
+RendezvousFindNodeResponse = _reflection.GeneratedProtocolMessageType('RendezvousFindNodeResponse', (_message.Message,), {
+  'DESCRIPTOR' : _RENDEZVOUSFINDNODERESPONSE,
+  '__module__' : 'RendezvousHashing_pb2'
+  # @@protoc_insertion_point(class_scope:RendezvousFindNodeResponse)
+  })
+_sym_db.RegisterMessage(RendezvousFindNodeResponse)
 
 RendezvousInformation = _reflection.GeneratedProtocolMessageType('RendezvousInformation', (_message.Message,), {
   'DESCRIPTOR' : _RENDEZVOUSINFORMATION,
@@ -172,8 +212,8 @@ _RENDEZVOUSHASHING = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=206,
-  serialized_end=528,
+  serialized_start=252,
+  serialized_end=585,
   methods=[
   _descriptor.MethodDescriptor(
     name='forward_to_responsible_node',
@@ -181,7 +221,7 @@ _RENDEZVOUSHASHING = _descriptor.ServiceDescriptor(
     index=0,
     containing_service=None,
     input_type=_RENDEZVOUSFINDNODEREQUEST,
-    output_type=_RENDEZVOUSEMPTY,
+    output_type=_RENDEZVOUSFINDNODERESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
