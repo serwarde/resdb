@@ -144,20 +144,29 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         key = the key for the item that should be stored
         value = only necessary for add and update
         """
-        print(request.replica)
 
-        if request.replica:
-            dict = self._replica_dict
-        else:
+        print("object: ",self._objects_dict)
+        print("replica: ",self._replica_dict)
+
+        if request.replica == 0:
             dict = self._objects_dict
+        elif request.replica == 1:
+            dict = self._replica_dict
 
+        # add request
         if request.type == 0:
             self.add_object(dict,request.key,request.value)
             return RN_pb2.NodeGetReply()
+
+        # get request
         elif request.type == 1:
-            foo = RN_pb2.NodeGetReply()
-            foo.values[:] = self.get_object(dict, request.key)
-            return foo
+            go = RN_pb2.NodeGetReply()
+            # get request can be in either dictonary
+            go.values[:] = self.get_object(self._objects_dict, request.key)
+            go.values.extend(self.get_object(self._replica_dict, request.key))
+            return go
+
+        # delete request
         elif request.type == 2:
             self.remove_object(dict, request.key,request.value)
             return RN_pb2.NodeGetReply()

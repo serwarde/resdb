@@ -16,6 +16,7 @@ from collections import defaultdict
 import grpc
 import socket
 import argparse
+import random
 from concurrent import futures
 
 # look how to import from AbstractRouterClass since it is our abstract class. Maybe like this: RendezvousHashing(AbstractRouterClass(RH_pb2_grpc.RendezvousHashingServicer))
@@ -154,24 +155,29 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         return the Node for the given key
         """
 
-        ip_from_champions = self.find_responsible_node(request.key, self._dict_nodes.copy().items(), self.replica)
+        tmp_dict_items = self._dict_nodes.copy().items()
 
-        # TODO: anders machen
         if request.type == 1:
-            ip_from_champions = ip_from_champions[:1]
-
-        champion = True
+            ip_from_champions = self.find_responsible_node(request.key, random.sample(tmp_dict_items,len(tmp_dict_items)-self.replica), 0)
+            type = type_pb2.UNSURE
+        else:
+            ip_from_champions = self.find_responsible_node(request.key, tmp_dict_items, self.replica)    
+            type = type_pb2.MAIN   
 
         for ip in ip_from_champions:
             # creates a connection  
             channel = grpc.insecure_channel(ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-            if champion:
+            if type == type_pb2.MAIN:
                 request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
-                champion = False
-            else:
-                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=True)
+                type = type_pb2.REPLICA
+            
+            elif type == type_pb2.REPLICA:
+                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=type)
+            
+            elif type == type_pb2.UNSURE:
+                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=type)
             
             # sends the request to the node
             response = node_stub.get_request(request)

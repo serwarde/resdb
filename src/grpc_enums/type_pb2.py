@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\ntype.proto*.\n\x0eGetRequestType\x12\x07\n\x03\x41\x44\x44\x10\x00\x12\x07\n\x03GET\x10\x01\x12\n\n\x06\x44\x45LETE\x10\x02\x62\x06proto3'
+  serialized_pb=b'\n\ntype.proto*.\n\x0eGetRequestType\x12\x07\n\x03\x41\x44\x44\x10\x00\x12\x07\n\x03GET\x10\x01\x12\n\n\x06\x44\x45LETE\x10\x02*-\n\x08\x44ictType\x12\x08\n\x04MAIN\x10\x00\x12\x0b\n\x07REPLICA\x10\x01\x12\n\n\x06UNSURE\x10\x02\x62\x06proto3'
 )
 
 _GETREQUESTTYPE = _descriptor.EnumDescriptor(
@@ -54,12 +54,47 @@ _GETREQUESTTYPE = _descriptor.EnumDescriptor(
 _sym_db.RegisterEnumDescriptor(_GETREQUESTTYPE)
 
 GetRequestType = enum_type_wrapper.EnumTypeWrapper(_GETREQUESTTYPE)
+_DICTTYPE = _descriptor.EnumDescriptor(
+  name='DictType',
+  full_name='DictType',
+  filename=None,
+  file=DESCRIPTOR,
+  create_key=_descriptor._internal_create_key,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='MAIN', index=0, number=0,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='REPLICA', index=1, number=1,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='UNSURE', index=2, number=2,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=62,
+  serialized_end=107,
+)
+_sym_db.RegisterEnumDescriptor(_DICTTYPE)
+
+DictType = enum_type_wrapper.EnumTypeWrapper(_DICTTYPE)
 ADD = 0
 GET = 1
 DELETE = 2
+MAIN = 0
+REPLICA = 1
+UNSURE = 2
 
 
 DESCRIPTOR.enum_types_by_name['GetRequestType'] = _GETREQUESTTYPE
+DESCRIPTOR.enum_types_by_name['DictType'] = _DICTTYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
