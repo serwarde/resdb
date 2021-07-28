@@ -137,15 +137,13 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
             for v in vs:
                 request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,value=v)
-                responses = node_stub.get_request(request)
-
-                for _ in responses:
-                    pass
+                node_stub.get_request(request)
 
         objects_on_node.clear()
         node_stub_del.remove_all(RN_pb2.NodeEmpty())
 
-
+    # TODO: currently gets are not returned
+    # TODO: for gets we can use a smaller list
     def forward_to_responsible_node(self, request, context):
         """
         finds the responsible node, for a given key
@@ -172,12 +170,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                 request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=True)
             
             # sends the request to the node
-            responses = node_stub.get_request(request)
-
-            for i in responses:
-                pass
-
-
+            node_stub.get_request(request)
 
         return RH_pb2.RendezvousEmpty()
 

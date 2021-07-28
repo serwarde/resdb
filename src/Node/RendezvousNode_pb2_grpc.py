@@ -14,7 +14,7 @@ class RendezvousNodeStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.get_request = channel.unary_stream(
+        self.get_request = channel.unary_unary(
                 '/RendezvousNode/get_request',
                 request_serializer=RendezvousNode__pb2.NodeGetRequest.SerializeToString,
                 response_deserializer=RendezvousNode__pb2.NodeGetReply.FromString,
@@ -77,7 +77,7 @@ class RendezvousNodeServicer(object):
 
 def add_RendezvousNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'get_request': grpc.unary_stream_rpc_method_handler(
+            'get_request': grpc.unary_unary_rpc_method_handler(
                     servicer.get_request,
                     request_deserializer=RendezvousNode__pb2.NodeGetRequest.FromString,
                     response_serializer=RendezvousNode__pb2.NodeGetReply.SerializeToString,
@@ -123,7 +123,7 @@ class RendezvousNode(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/RendezvousNode/get_request',
+        return grpc.experimental.unary_unary(request, target, '/RendezvousNode/get_request',
             RendezvousNode__pb2.NodeGetRequest.SerializeToString,
             RendezvousNode__pb2.NodeGetReply.FromString,
             options, channel_credentials,

@@ -2,7 +2,7 @@ syntax = "proto3";
 import "type.proto";
 
 service RendezvousNode {
-    rpc get_request (NodeGetRequest) returns (stream NodeGetReply) {};  
+    rpc get_request (NodeGetRequest) returns (NodeGetReply) {};  
     rpc get_objects (NodeEmpty) returns (stream NodeGetObjectsReply) {};  
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
     rpc send_item_to_new_node (NodeSendItemToNewNodeRequest) returns (NodeEmpty) {};
@@ -17,7 +17,7 @@ message NodeGetRequest {
 }
 
 message NodeGetReply {
-    optional string value = 1;
+    repeated string values = 1;
 }
 
 message NodeGetObjectsReply {

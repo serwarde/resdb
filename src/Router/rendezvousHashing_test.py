@@ -123,64 +123,47 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
         request = RN_pb2.NodeGetRequest(type=type_pb2.GET,key=key)
         if stub==0:
-            responses = self.node_stub0.get_request(request)
+            response = self.node_stub0.get_request(request)
         elif stub == 1:
-            responses = self.node_stub1.get_request(request)
+            response = self.node_stub1.get_request(request)
         else:
-            responses = self.node_stub2.get_request(request)
+            response = self.node_stub2.get_request(request)
         
-        x = []
-        for response in responses:
-            x.append(response.value)
-        
+        x = list(response.values)
         self.assertEqual(len(values), len(x), "len(values) != len(responses)")
-        self.assertListEqual(values, x)    
+        self.assertListEqual(values, x)        
 
 
     def add_helper(self):
         # adds keys in node 0
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
+        
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="bob1",value="34")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
+        
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="54")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
+        
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="612")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
+        
         request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",value="54")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
 
     def del_helper(self):
         # deletes keys in each node
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam")
-        responses = self.node_stub0.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub0.get_request(request)
         
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="bob1")
-        responses = self.node_stub1.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub1.get_request(request)
 
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Nico")
-        responses = self.node_stub2.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub2.get_request(request)
 
         request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Serwar")
-        responses = self.node_stub2.get_request(request)
-        for i in responses:
-            pass
+        self.node_stub2.get_request(request)
 
 if __name__ == '__main__':
     unittest.main()

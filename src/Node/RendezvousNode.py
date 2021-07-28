@@ -21,8 +21,6 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         self._http_port = port
         self._node_weight = weight
         self._hashing = hashlib.md5
-        # TODO: Check if ip_address is a adequate seed for the node
-        self._node_seed = str(ip_address)+str(weight)
         # TODO: Check if a list is a good representation for values
         self._objects_dict = defaultdict(list)
         self._replica_dict = defaultdict(list)
@@ -72,10 +70,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
                 # TODO: maybe store hash values of the keys?
                 for v in vs:
                     request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,value=v)
-                    responses = node_stub.get_request(request)
-
-                    for _ in responses:
-                        pass
+                    node_stub.get_request(request)
                                 
                 self.remove_object(self._objects_dict,key)
 
@@ -160,8 +155,9 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             self.add_object(dict,request.key,request.value)
             return RN_pb2.NodeGetReply()
         elif request.type == 1:
-            for value in self.get_object(dict, request.key):
-                yield RN_pb2.NodeGetReply(value=value)
+            foo = RN_pb2.NodeGetReply()
+            foo.values[:] = self.get_object(dict, request.key)
+            return foo
         elif request.type == 2:
             self.remove_object(dict, request.key,request.value)
             return RN_pb2.NodeGetReply()
