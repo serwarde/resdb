@@ -13,6 +13,7 @@ message NodeGetRequest {
     GetRequestType type = 1;
     string key = 2;
     optional string value = 3;
+    bool replica = 4;
 }
 
 message NodeGetReply {

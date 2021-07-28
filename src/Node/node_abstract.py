@@ -4,16 +4,9 @@ from typing import Union
 
 class AbstractNodeClass(metaclass=ABCMeta):
     
-    _host_name = abstract_attribute()
     _host_ip = abstract_attribute()
     _http_port = abstract_attribute()
     _objects_dict = abstract_attribute()
-    
-    def get_host_name(self):
-        """
-        Returns the host_name of the node
-        """
-        return self._host_name
     
     def get_host_ip(self):
         """

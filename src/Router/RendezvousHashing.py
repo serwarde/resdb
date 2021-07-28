@@ -27,6 +27,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         ## TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.set_nodes()
+        self.replica = 2
 
     def set_nodes(self):
         """
@@ -121,16 +122,15 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         request = RN_pb2.NodeEmpty()
         responses = node_stub_del.get_objects(request)
 
-        print("started the channel")
-
         # reconstruct the dictionary of objects saved on the node
         for response in responses:
             objects_on_node[response.key].append(response.value)
 
         # TODO: This solution is not efficient, we should use the node for this
         # , but I'm not sure whether it's a design or programming issue. 
+        # TODO: currently not replicas are used
         for key, vs in objects_on_node.items():
-            champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items())
+            champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items())[0]
             
             channel = grpc.insecure_channel(champion_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
@@ -146,7 +146,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         node_stub_del.remove_all(RN_pb2.NodeEmpty())
 
 
-    # DONE: the request gets forwarded directly from the router after finding the responsible node
     def forward_to_responsible_node(self, request, context):
         """
         finds the responsible node, for a given key
@@ -157,24 +156,33 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         return the Node for the given key
         """
 
-        champion_ip = self.find_responsible_node(request.key, self._dict_nodes.copy().items())
+        ip_from_champions = self.find_responsible_node(request.key, self._dict_nodes.copy().items())
+       
+        champion = True
 
-        # creates a connection to the champion node
-        channel = grpc.insecure_channel(champion_ip)
-        node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+        for ip in ip_from_champions:
+            # creates a connection  
+            channel = grpc.insecure_channel(ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-        # sends the request to the node
-        request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
-        responses = node_stub.get_request(request)
+            if champion:
+                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
+                champion = False
+            else:
+                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=True)
+            
+            # sends the request to the node
+            responses = node_stub.get_request(request)
 
-        for i in responses:
-            pass
+            for i in responses:
+                pass
+
+
 
         return RH_pb2.RendezvousEmpty()
 
-    def find_responsible_node(self, key, dict_nodes_items):
-        champion_ip = None
-        maxValue = -1
+    def find_responsible_node(self, key, dict_nodes_items, replica=1):
+        dict = {}
 
         # TODO: threading
         for _, n_ip in dict_nodes_items:
@@ -187,12 +195,11 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             request_node = RN_pb2.NodeHashValueForRequest(key=key)
             currentValue = node_stub.hash_value_for_key(request_node)
 
-            # check if node is the biggest
-            if currentValue.hashValue > maxValue:
-                maxValue = currentValue.hashValue
-                champion_ip = n_ip
-        
-        return champion_ip 
+            dict[n_ip] = currentValue.hashValue
+
+        # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.
+        # It is in order therefore is the first node the champion
+        return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:replica]]
 
 def serve(ip_address, port):
     # starts the grpc server

@@ -1,5 +1,5 @@
 from src.Node.node_abstract import AbstractNodeClass
-from typing import DefaultDict, Union
+from typing import Union
 from collections import defaultdict
 
 import hashlib
@@ -16,16 +16,16 @@ from concurrent import futures
 
 class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
-    def __init__(self, name, ip_address, port, weight):
-        self._host_name = name
+    def __init__(self, ip_address, port, weight):
         self._host_ip = ip_address
         self._http_port = port
         self._node_weight = weight
         self._hashing = hashlib.md5
         # TODO: Check if ip_address is a adequate seed for the node
-        self._node_seed = str(ip_address)+str(name)
+        self._node_seed = str(ip_address)+str(weight)
         # TODO: Check if a list is a good representation for values
         self._objects_dict = defaultdict(list)
+        self._replica_dict = defaultdict(list)
 
     def hash_value_for_key(self, request, context) -> float:
         """
@@ -76,13 +76,13 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
                     for _ in responses:
                         pass
-
-                self.remove_object(key)
+                                
+                self.remove_object(self._objects_dict,key)
 
         return RN_pb2.NodeEmpty()
                 
 
-    def add_object(self, key, value):
+    def add_object(self, dict, key, value):
         """
         not GRPC
 
@@ -92,9 +92,9 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         TODO: extend to working with dicts as values
         """
-        self._objects_dict[key].append(value)
+        dict[key].append(value)
 
-    def remove_object(self, key, value=None):
+    def remove_object(self, dict, key, value=None):
         """
         not GRPC
 
@@ -107,7 +107,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         if key in self._objects_dict:
             if value:
                 try:
-                    self._objects_dict[key].remove(value)
+                    dict[key].remove(value)
                 except ValueError:
                     pass # do nothing if the value is not in the list
             else:
@@ -115,14 +115,14 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
     # DONE: delete update object since it is not needed
     
-    def get_object(self, key) -> Union[int,str,list,bool,tuple,dict]:
+    def get_object(self, dict, key) -> Union[int,str,list,bool,tuple,dict]:
         """
         not GRPC
 
         returns the values for a given key
         key = the key from the object
         """
-        return self._objects_dict[key]
+        return dict[key]
 
     def get_objects(self, request, context) -> dict:
         """
@@ -149,24 +149,29 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         key = the key for the item that should be stored
         value = only necessary for add and update
         """
-        print(self._objects_dict)
+        print(request.replica)
+
+        if request.replica:
+            dict = self._replica_dict
+        else:
+            dict = self._objects_dict
 
         if request.type == 0:
-            self.add_object(request.key,request.value)
+            self.add_object(dict,request.key,request.value)
             return RN_pb2.NodeGetReply()
         elif request.type == 1:
-            for value in self.get_object(request.key):
+            for value in self.get_object(dict, request.key):
                 yield RN_pb2.NodeGetReply(value=value)
         elif request.type == 2:
-            self.remove_object(request.key,request.value)
+            self.remove_object(dict, request.key,request.value)
             return RN_pb2.NodeGetReply()
         
         
         
 
-def serve(name, ip_address, port, weight):
+def serve(ip_address, port, weight):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    RN_pb2_grpc.add_RendezvousNodeServicer_to_server(RendezvousNode(name, ip_address, port, weight), server)
+    RN_pb2_grpc.add_RendezvousNodeServicer_to_server(RendezvousNode(ip_address, port, weight), server)
     server.add_insecure_port(f'{ip_address}:{port}')
     server.start()
     try:
@@ -184,4 +189,4 @@ if __name__ == '__main__':
     ip_address = socket.gethostbyname(hostname)
     
     print(f"starting Node: {ip_address}:{args.port} with {args.weight}.")
-    serve(args.name, ip_address, args.port, args.weight)
+    serve(ip_address, args.port, args.weight)
