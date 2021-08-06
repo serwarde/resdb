@@ -46,21 +46,17 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         self._dict_nodes[request.name] = request.ip_address
         return RH_pb2.RendezvousEmpty()
 
-    # TODO: if we use multiple routers, we need to ensure that all of them have the same _dict_nodes, currently its gets only updated in the init.
-    # TODO: Serverinfomration send an update when a node gets added or deleted
-    # TODO: add paramerter so we can use this function to update the information in all routers
     def add_node(self, request, context):
         """
         adds a new Node into the Router.
         Also handles node balancing
-
-        node: the node that should be added
         """
 
         request = NS_pb2.AddRequest(
             type=NS_pb2.NODE, name=request.name, ip_address=request.ip_address)
         self.naming_service_stub.add_(request)
 
+        # redistributes object to the new node
         self.redistribute_objects_to_new_node(request.ip_address)
 
         return RH_pb2.RendezvousEmpty()
@@ -73,7 +69,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
 
         # TODO: threading?
-        for _, n_ip in self._dict_nodes.copy().items():
+
+        # loops over the ips and calls each node, to restribute their values to the new node
+        # TODO: we currently dont look at replicas
+        for n_ip in self._dict_nodes.copy().values():
             if n_ip == ip_address:
                 continue
 
@@ -82,6 +81,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
             request = RN_pb2.NodeSendItemToNewNodeRequest(
                 ip_address=ip_address)
+            # sends a request to a node with the ip of the new node
             node_stub.send_item_to_new_node(request)
 
     def _remove_node(self, request, context):
@@ -113,7 +113,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         """
         Redistributes all Key,Values of a deleted Node
 
-        node: the node that should be deleted
+        ip_address: the ip_address of the node that should be deleted
         """
         objects_on_node = defaultdict(list)
         channel = grpc.insecure_channel(ip_address)
@@ -123,27 +123,30 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         # reconstruct the dictionary of objects saved on the node
         for response in responses:
-            objects_on_node[response.key].append(response.value)
+            objects_on_node[response.key].extend(response.values)
 
-        # TODO: This solution is not efficient, we should use the node for this
-        # , but I'm not sure whether it's a design or programming issue.
-        # TODO: currently not replicas are used
+        # TODO: This solution is not efficient, we should use the node for this, but I'm not sure whether it's a design or programming issue.
+        # TODO: replicas are currently not looked at
         for key, vs in objects_on_node.items():
+            # find the champion
             champion_ip = self.find_responsible_node(
-                key, self._dict_nodes.copy().items(), self.replica)[0]
+                key, self._dict_nodes.copy().items())[0]
 
+            # connect to the champion
             channel = grpc.insecure_channel(champion_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
+            # send a add request to the champion
             request = RN_pb2.NodeGetRequest(
                 type=type_pb2.ADD, key=key, values=vs)
             node_stub.get_request(request)
-
+        	
+        # clears the created dict
         objects_on_node.clear()
+        # removes all elements
         node_stub_del.remove_all(RN_pb2.NodeEmpty())
 
-    # TODO: currently gets are not returned
-    # TODO: for gets we can use a smaller list
+    # TODO: Do Error if replicas+1 > total Nodes
     def forward_to_responsible_node(self, request, context):
         """
         finds the responsible node, for a given key
@@ -156,9 +159,10 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         tmp_dict_items = self._dict_nodes.copy().items()
 
+        # if it is a get request, just take a subset
         if request.type == 1:
             ip_from_champions = self.find_responsible_node(request.key, random.sample(
-                tmp_dict_items, len(tmp_dict_items)-self.replica), 0)
+                tmp_dict_items, len(tmp_dict_items)-self.replica))
             type = type_pb2.UNSURE
         else:
             ip_from_champions = self.find_responsible_node(
@@ -176,11 +180,11 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                 type = type_pb2.REPLICA
 
             elif type == type_pb2.REPLICA:
-                type = RN_pb2.NodeGetRequest(
+                request = RN_pb2.NodeGetRequest(
                     type=request.type, key=request.key, values=request.values, replica=type)
 
             elif type == type_pb2.UNSURE:
-                type = RN_pb2.NodeGetRequest(
+                request = RN_pb2.NodeGetRequest(
                     type=request.type, key=request.key, values=request.values, replica=type)
 
             # sends the request to the node
@@ -193,7 +197,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             fnd = RH_pb2.RendezvousFindNodeResponse(values=response.values)
             return fnd
 
-    def find_responsible_node(self, key, dict_nodes_items, replica):
+    def find_responsible_node(self, key, dict_nodes_items, n_highest=0):
         dict = {}
 
         # TODO: threading
@@ -211,7 +215,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.
         # It is in order therefore is the first node the champion
-        return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:replica]]
+        return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
 
 
 def serve(ip_address, port):

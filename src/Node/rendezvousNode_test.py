@@ -62,7 +62,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         responses = self.stub.get_objects(request)
 
         for response in responses:
-            objects_on_node[response.key].append(response.value)
+            objects_on_node[response.key].extend(response.values)
 
         self.assertEqual(len(objects_on_node["Sam"]), len(
             ["24", "14", "42"]), "len(values) != len(responses)")

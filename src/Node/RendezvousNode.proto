@@ -22,7 +22,7 @@ message NodeGetReply {
 
 message NodeGetObjectsReply {
     optional string key = 1;
-    optional string value = 2;
+    repeated string values = 2;
 }
 
 message NodeHashValueForRequest {

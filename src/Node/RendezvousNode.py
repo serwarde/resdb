@@ -97,7 +97,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         key = the key from the object
         value = optional parameter, if a specific value/s should be deleted
         """
-        if key in self._objects_dict:
+        if key in dict:
             if values:
                 for value in values:
                     try:
@@ -125,11 +125,11 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         returns all objects in node
         """
         for key, values in self._objects_dict.copy().items():
-            for value in values:
-                yield RN_pb2.NodeGetObjectsReply(key=key, value=value)
+            yield RN_pb2.NodeGetObjectsReply(key=key, values=values)
 
     def remove_all(self, request, context):
         self._objects_dict.clear()
+        self._replica_dict.clear()
         return RN_pb2.NodeEmpty()
 
     def get_request(self, request, context):
@@ -143,6 +143,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         value = only necessary for add and update
         """
 
+        #print("key: ",request.key, "values: ", request.values, " type:",request.type, " replica:", request.replica)
         print("object: ", self._objects_dict)
         print("replica: ", self._replica_dict)
 
@@ -150,6 +151,8 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             dict = self._objects_dict
         elif request.replica == 1:
             dict = self._replica_dict
+        else:
+            dict = {}
 
         # add request
         if request.type == 0:
@@ -157,11 +160,14 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             return RN_pb2.NodeGetReply()
 
         # get request
-        elif request.type == 1:
-            ngr = RN_pb2.NodeGetReply()
+        elif request.type == 1: 
             # get request can be in either dictonary
-            ngr.values[:] = self.get_object(self._objects_dict, request.key)
-            ngr.values.extend(self.get_object(self._replica_dict, request.key))
+            if dict:
+                ngr = RN_pb2.NodeGetReply(values=self.get_object(dict, request.key))
+            else:
+                ngr = RN_pb2.NodeGetReply()
+                ngr.values[:] = self.get_object(self._objects_dict, request.key)
+                ngr.values.extend(self.get_object(self._replica_dict, request.key))
             return ngr
 
         # delete request

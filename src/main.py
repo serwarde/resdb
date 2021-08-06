@@ -30,7 +30,7 @@ def show_response(stub=0):
         responses = node_stub2.get_objects(requestEmpty)
 
     for response in responses:
-        objects_on_node[response.key].append(response.value)
+        objects_on_node[response.key].extend(response.values)
 
     print(f"Items on Node {stub}")
     print(objects_on_node)
