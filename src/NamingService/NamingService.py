@@ -1,14 +1,13 @@
-import time
-from concurrent import futures
-import random
-import grpc
 import argparse
+import random
+from concurrent import futures
 
+import grpc
 import src.NamingService.NamingService_pb2 as NamingService_pb2
 import src.NamingService.NamingService_pb2_grpc as NamingService_pb2_grpc
-
 import src.Router.RendezvousHashing_pb2 as RH_pb2
 import src.Router.RendezvousHashing_pb2_grpc as RH_pb2_grpc
+
 
 class NamingService(NamingService_pb2_grpc.NamingServiceServicer):
     lb_information = {}

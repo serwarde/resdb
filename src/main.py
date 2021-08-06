@@ -1,11 +1,11 @@
-import src.Node.RendezvousNode_pb2 as RN_pb2
-import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
+from collections import defaultdict
 
-from src.LoadBalancer.LoadBalancer import LoadBalancer 
-import src.grpc_enums.type_pb2 as type_pb2
 import grpc
 
-from collections import defaultdict
+import src.grpc_enums.type_pb2 as type_pb2
+import src.Node.RendezvousNode_pb2 as RN_pb2
+import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
+from src.LoadBalancer.LoadBalancer import LoadBalancer
 
 lb = LoadBalancer()
 
@@ -53,10 +53,9 @@ print("Add node0. Number of nodes=1")
 lb.add_node("node0","172.17.0.4","50251")
 
 print("Add Nico, Sam and Server. Number of nodes=1") 
-lb.request(type=type_pb2.ADD,key="Nico",value="57")
-lb.request(type=type_pb2.ADD,key="Nico",value="Test")
-lb.request(type=type_pb2.ADD,key="Sam",value="12")
-lb.request(type=type_pb2.ADD,key="bob1",value="42")
+lb.request(type=type_pb2.ADD,key="Nico",values=["57","Test"])
+lb.request(type=type_pb2.ADD,key="Sam",values=["12"])
+lb.request(type=type_pb2.ADD,key="bob1",values=["42"])
 show_all_responses()
 
 print("GET: Nico, Values: ", list(lb.request(type=type_pb2.GET,key="Nico").values))
@@ -75,7 +74,7 @@ lb.remove_node("node1","172.17.0.5","50252")
 show_all_responses()
 
 print("delete bob1. Number of nodes=2") 
-lb.request(type=type_pb2.DELETE,key="bob1",value="42")
+lb.request(type=type_pb2.DELETE,key="bob1",values=["42"])
 show_all_responses()
 
 

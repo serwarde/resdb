@@ -1,14 +1,14 @@
-import grpc
-
 import unittest
 
+import grpc
 import src.NamingService.NamingService_pb2 as NS_pb2
 import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
+
 class TestNamingServiceMethods(unittest.TestCase):
-    
+
     def __init__(self, *args, **kwargs):
         super(TestNamingServiceMethods, self).__init__(*args, **kwargs)
         channel = grpc.insecure_channel('localhost:50050')
@@ -19,7 +19,8 @@ class TestNamingServiceMethods(unittest.TestCase):
 
     def test2_add(self):
         # Add new servers
-        request = NS_pb2.AddRequest(type=NS_pb2.LOADBALANCER, name="LB1", ip_address = "192.168.0.1:55003")
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.LOADBALANCER, name="LB1", ip_address="192.168.0.1:55003")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was successfull")
 
@@ -27,34 +28,39 @@ class TestNamingServiceMethods(unittest.TestCase):
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was successfull")"""
 
-        request = NS_pb2.AddRequest(type=NS_pb2.NODE, name="Node1", ip_address = "192.168.0.1:55005")
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.NODE, name="Node1", ip_address="192.168.0.1:55005")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was successfull")
 
         # Try to add the same servers again
-        request = NS_pb2.AddRequest(type=NS_pb2.LOADBALANCER, name="LB1", ip_address = "192.168.0.1:55003")
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.LOADBALANCER, name="LB1", ip_address="192.168.0.1:55003")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was not successfull")
-        
+
         """request = NS_pb2.AddRequest(type=NS_pb2.ROUTER, name="Router1", ip_address = "192.168.0.1:55004")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was not successfull")"""
-        
-        request = NS_pb2.AddRequest(type=NS_pb2.NODE, name="Node1", ip_address = "192.168.0.1:55005")
+
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.NODE, name="Node1", ip_address="192.168.0.1:55005")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was not successfull")
 
         # Try to add on none existing server types
-        request = NS_pb2.AddRequest(type=4, name="Node1", ip_address = "192.168.0.1:55005")
+        request = NS_pb2.AddRequest(
+            type=4, name="Node1", ip_address="192.168.0.1:55005")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was not successfull")
 
-        request = NS_pb2.AddRequest(type=-1, name="Node1", ip_address = "192.168.0.1:55005")
+        request = NS_pb2.AddRequest(
+            type=-1, name="Node1", ip_address="192.168.0.1:55005")
         response = self.stub.add_(request)
         self.assertEqual(response.message, "Add was not successfull")
 
     def test3_get(self):
-        
+
         # Tries to get the ips from existing names
         request = NS_pb2.GetRequest(type=NS_pb2.LOADBALANCER, name="LB1")
         response = self.stub.get_(request)
@@ -72,11 +78,11 @@ class TestNamingServiceMethods(unittest.TestCase):
         request = NS_pb2.GetRequest(type=NS_pb2.LOADBALANCER, name="LB2")
         response = self.stub.get_(request)
         self.assertEqual(response.message, "No IP-Address for this Name found")
-        
+
         """request = NS_pb2.GetRequest(type=NS_pb2.ROUTER, name="Router2")
         response = self.stub.get_(request)
         self.assertEqual(response.message, "No IP-Address for this Name found")"""
-        
+
         request = NS_pb2.GetRequest(type=NS_pb2.NODE, name="Node2")
         response = self.stub.get_(request)
         self.assertEqual(response.message, "No IP-Address for this Name found")
@@ -94,7 +100,7 @@ class TestNamingServiceMethods(unittest.TestCase):
         # Tries to get the a random server with one dict entry
         request = NS_pb2.GetRandomRequest(type=NS_pb2.LOADBALANCER)
         response = self.stub.get_random_(request)
-        self.assertEqual(response.name, "LB1") 
+        self.assertEqual(response.name, "LB1")
         self.assertEqual(response.ip_address, "192.168.0.1:55003")
 
         """request = NS_pb2.GetRandomRequest(type=NS_pb2.ROUTER)
@@ -108,21 +114,24 @@ class TestNamingServiceMethods(unittest.TestCase):
         self.assertEqual(response.ip_address, "192.168.0.1:55005")
 
         # Tries to get the a random server with multiple dict entries
-        request = NS_pb2.AddRequest(type=NS_pb2.LOADBALANCER, name="LB2", ip_address="192.168.0.1:55004")
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.LOADBALANCER, name="LB2", ip_address="192.168.0.1:55004")
         response = self.stub.add_(request)
-        request = NS_pb2.AddRequest(type=NS_pb2.LOADBALANCER, name="LB3", ip_address="192.168.0.1:55005")
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.LOADBALANCER, name="LB3", ip_address="192.168.0.1:55005")
         response = self.stub.add_(request)
 
         request = NS_pb2.GetRandomRequest(type=NS_pb2.LOADBALANCER)
         response = self.stub.get_random_(request)
-        ip_addresses = ["192.168.0.1:55003", "192.168.0.1:55004", "192.168.0.1:55005"]
+        ip_addresses = ["192.168.0.1:55003",
+                        "192.168.0.1:55004", "192.168.0.1:55005"]
         self.assertIn(response.name, ["LB1", "LB2", "LB3"])
         self.assertIn(response.ip_address, ip_addresses)
         response = self.stub.get_random_(request)
         self.assertIn(response.name, ["LB1", "LB2", "LB3"])
         self.assertIn(response.ip_address, ip_addresses)
         response = self.stub.get_random_(request)
-        self.assertIn(response.name, ["LB1", "LB2", "LB3"]) 
+        self.assertIn(response.name, ["LB1", "LB2", "LB3"])
         self.assertIn(response.ip_address, ip_addresses)
 
         # Tries to get the a random server with multiple on wrong type
@@ -143,14 +152,14 @@ class TestNamingServiceMethods(unittest.TestCase):
                 self.assertEqual(response.ip_address, "192.168.0.1:55003")
                 self.assertEqual(response.name, "LB1")
             elif i == 1:
-                self.assertEqual(response.ip_address, "192.168.0.1:55004") 
+                self.assertEqual(response.ip_address, "192.168.0.1:55004")
                 self.assertEqual(response.name, "LB2")
             elif i == 2:
-                self.assertEqual(response.ip_address, "192.168.0.1:55005") 
+                self.assertEqual(response.ip_address, "192.168.0.1:55005")
                 self.assertEqual(response.name, "LB3")
 
     def test6_delete(self):
-        
+
         # trie to delete servers
         request = NS_pb2.DeleteRequest(type=NS_pb2.LOADBALANCER, name="LB1")
         response = self.stub.delete_(request)
@@ -168,11 +177,11 @@ class TestNamingServiceMethods(unittest.TestCase):
         request = NS_pb2.DeleteRequest(type=NS_pb2.LOADBALANCER, name="LB1")
         response = self.stub.delete_(request)
         self.assertEqual(response.message, "Delete was not successfull")
-        
+
         """request = NS_pb2.DeleteRequest(type=NS_pb2.ROUTER, name="Router1")
         response = self.stub.delete_(request)
         self.assertEqual(response.message, "Delete was not successfull")"""
-        
+
         request = NS_pb2.DeleteRequest(type=NS_pb2.NODE, name="Node1")
         response = self.stub.delete_(request)
         self.assertEqual(response.message, "Delete was not successfull")
@@ -193,11 +202,11 @@ class TestNamingServiceMethods(unittest.TestCase):
         request = NS_pb2.DeleteAllRequest(type=NS_pb2.LOADBALANCER)
         response = self.stub.delete_all_(request)
         self.assertEqual(response.message, "Delete was successfull")
-        
+
         request = NS_pb2.DeleteAllRequest(type=NS_pb2.ROUTER)
         response = self.stub.delete_all_(request)
         self.assertEqual(response.message, "Delete was successfull")
-        
+
         request = NS_pb2.DeleteAllRequest(type=NS_pb2.NODE)
         response = self.stub.delete_all_(request)
         self.assertEqual(response.message, "Delete was successfull")
@@ -207,6 +216,6 @@ class TestNamingServiceMethods(unittest.TestCase):
         response = self.stub.delete_all_(request)
         self.assertEqual(response.message, "Delete was not successfull")
 
+
 if __name__ == '__main__':
     unittest.main()
-    

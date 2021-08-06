@@ -1,31 +1,28 @@
-from src.Node.RendezvousNode import RendezvousNode
-from src.Router.router_abstract import AbstractRouterClass
-
-import src.NamingService.NamingService_pb2 as NS_pb2
-import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
-
-import src.Router.RendezvousHashing_pb2 as RH_pb2
-import src.Router.RendezvousHashing_pb2_grpc as RH_pb2_grpc
-
-import src.Node.RendezvousNode_pb2 as RN_pb2
-import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
-
-import src.grpc_enums.type_pb2 as type_pb2
-
-from collections import defaultdict
-import grpc
-import socket
 import argparse
 import random
+import socket
+from collections import defaultdict
 from concurrent import futures
+
+import grpc
+import src.grpc_enums.type_pb2 as type_pb2
+import src.NamingService.NamingService_pb2 as NS_pb2
+import src.NamingService.NamingService_pb2_grpc as NS_pb2_grpc
+import src.Node.RendezvousNode_pb2 as RN_pb2
+import src.Node.RendezvousNode_pb2_grpc as RN_pb2_grpc
+import src.Router.RendezvousHashing_pb2 as RH_pb2
+import src.Router.RendezvousHashing_pb2_grpc as RH_pb2_grpc
+from src.Router.router_abstract import AbstractRouterClass
 
 # look how to import from AbstractRouterClass since it is our abstract class. Maybe like this: RendezvousHashing(AbstractRouterClass(RH_pb2_grpc.RendezvousHashingServicer))
 # DONE: inheriting from two classes at the same time could be done by separating them with a comma (nice one!)
+
+
 class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServicer):
     def __init__(self) -> None:
         channel = grpc.insecure_channel("172.17.0.2:50050")
         self.naming_service_stub = NS_pb2_grpc.NamingServiceStub(channel)
-        ## TODO: Locking this attribute to ensure sync
+        # TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.set_nodes()
         self.replica = 1
@@ -59,8 +56,9 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         node: the node that should be added
         """
-        
-        request = NS_pb2.AddRequest(type=NS_pb2.NODE,name=request.name,ip_address=request.ip_address)
+
+        request = NS_pb2.AddRequest(
+            type=NS_pb2.NODE, name=request.name, ip_address=request.ip_address)
         self.naming_service_stub.add_(request)
 
         self.redistribute_objects_to_new_node(request.ip_address)
@@ -82,7 +80,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             # TODO: catch if we cant connect to the node
             channel = grpc.insecure_channel(n_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
-            request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address=ip_address)
+            request = RN_pb2.NodeSendItemToNewNodeRequest(
+                ip_address=ip_address)
             node_stub.send_item_to_new_node(request)
 
     def _remove_node(self, request, context):
@@ -95,7 +94,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         del self._dict_nodes[request.name]
         return RH_pb2.RendezvousEmpty()
 
-
     def remove_node(self, request, context):
         """
         removes a Node from the Router.
@@ -107,7 +105,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         request_sis = NS_pb2.DeleteRequest(type=NS_pb2.NODE, name=request.name)
         self.naming_service_stub.delete_(request_sis)
-        
+
         self.redistribute_objects_from_deleted_node(request.ip_address)
         return RH_pb2.RendezvousEmpty()
 
@@ -128,15 +126,17 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             objects_on_node[response.key].append(response.value)
 
         # TODO: This solution is not efficient, we should use the node for this
-        # , but I'm not sure whether it's a design or programming issue. 
+        # , but I'm not sure whether it's a design or programming issue.
         # TODO: currently not replicas are used
         for key, vs in objects_on_node.items():
-            champion_ip = self.find_responsible_node(key, self._dict_nodes.copy().items(), self.replica)[0]
-            
+            champion_ip = self.find_responsible_node(
+                key, self._dict_nodes.copy().items(), self.replica)[0]
+
             channel = grpc.insecure_channel(champion_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
- 
-            request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,values=vs)
+
+            request = RN_pb2.NodeGetRequest(
+                type=type_pb2.ADD, key=key, values=vs)
             node_stub.get_request(request)
 
         objects_on_node.clear()
@@ -157,27 +157,32 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         tmp_dict_items = self._dict_nodes.copy().items()
 
         if request.type == 1:
-            ip_from_champions = self.find_responsible_node(request.key, random.sample(tmp_dict_items,len(tmp_dict_items)-self.replica), 0)
+            ip_from_champions = self.find_responsible_node(request.key, random.sample(
+                tmp_dict_items, len(tmp_dict_items)-self.replica), 0)
             type = type_pb2.UNSURE
         else:
-            ip_from_champions = self.find_responsible_node(request.key, tmp_dict_items, self.replica)    
-            type = type_pb2.MAIN   
+            ip_from_champions = self.find_responsible_node(
+                request.key, tmp_dict_items, self.replica)
+            type = type_pb2.MAIN
 
         for ip in ip_from_champions:
-            # creates a connection  
+            # creates a connection
             channel = grpc.insecure_channel(ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             if type == type_pb2.MAIN:
-                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values)
+                request = RN_pb2.NodeGetRequest(
+                    type=request.type, key=request.key, values=request.values)
                 type = type_pb2.REPLICA
-            
+
             elif type == type_pb2.REPLICA:
-                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values, replica=type)
-            
+                type = RN_pb2.NodeGetRequest(
+                    type=request.type, key=request.key, values=request.values, replica=type)
+
             elif type == type_pb2.UNSURE:
-                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values, replica=type)
-            
+                type = RN_pb2.NodeGetRequest(
+                    type=request.type, key=request.key, values=request.values, replica=type)
+
             # sends the request to the node
             response = node_stub.get_request(request)
 
@@ -208,10 +213,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # It is in order therefore is the first node the champion
         return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:replica]]
 
+
 def serve(ip_address, port):
     # starts the grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    RH_pb2_grpc.add_RendezvousHashingServicer_to_server(RendezvousHashing(), server)
+    RH_pb2_grpc.add_RendezvousHashingServicer_to_server(
+        RendezvousHashing(), server)
     server.add_insecure_port(f"{ip_address}:{port}")
     server.start()
     try:
@@ -223,11 +230,12 @@ def serve(ip_address, port):
 if __name__ == "__main__":
     # arguments
     parser = argparse.ArgumentParser(description='Create Rendezvous Router.')
-    parser.add_argument('--port', '-p', type=int, help='The port of the Router', default=50151)
+    parser.add_argument('--port', '-p', type=int,
+                        help='The port of the Router', default=50151)
     args = parser.parse_args()
-    
+
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    
+
     print(f"starting Router: {ip_address}:{args.port}.")
     serve(ip_address, args.port)
