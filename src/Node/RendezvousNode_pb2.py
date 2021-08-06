@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"k\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x12\n\x05value\x18\x03 \x01(\tH\x00\x88\x01\x01\x12\x0f\n\x07replica\x18\x04 \x01(\x08\x42\x08\n\x06_value\"\x1e\n\x0cNodeGetReply\x12\x0e\n\x06values\x18\x01 \x03(\t\"M\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05value\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x06\n\x04_keyB\x08\n\x06_value\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\xac\x02\n\x0eRendezvousNode\x12/\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x12$\n\nremove_all\x12\n.NodeEmpty\x1a\n.NodeEmptyb\x06proto3'
+  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"h\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x0e\n\x06values\x18\x03 \x03(\t\x12\x1a\n\x07replica\x18\x04 \x01(\x0e\x32\t.DictType\"\x1e\n\x0cNodeGetReply\x12\x0e\n\x06values\x18\x01 \x03(\t\"M\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05value\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x06\n\x04_keyB\x08\n\x06_value\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\xac\x02\n\x0eRendezvousNode\x12/\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x12$\n\nremove_all\x12\n.NodeEmpty\x1a\n.NodeEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -50,16 +50,16 @@ _NODEGETREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='value', full_name='NodeGetRequest.value', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='values', full_name='NodeGetRequest.values', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='replica', full_name='NodeGetRequest.replica', index=3,
-      number=4, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -74,14 +74,9 @@ _NODEGETREQUEST = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
-    _descriptor.OneofDescriptor(
-      name='_value', full_name='NodeGetRequest._value',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
   ],
   serialized_start=36,
-  serialized_end=143,
+  serialized_end=140,
 )
 
 
@@ -112,8 +107,8 @@ _NODEGETREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=145,
-  serialized_end=175,
+  serialized_start=142,
+  serialized_end=172,
 )
 
 
@@ -161,8 +156,8 @@ _NODEGETOBJECTSREPLY = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=177,
-  serialized_end=254,
+  serialized_start=174,
+  serialized_end=251,
 )
 
 
@@ -193,8 +188,8 @@ _NODEHASHVALUEFORREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=256,
-  serialized_end=294,
+  serialized_start=253,
+  serialized_end=291,
 )
 
 
@@ -225,8 +220,8 @@ _NODEHASHVALUEFORREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=296,
-  serialized_end=338,
+  serialized_start=293,
+  serialized_end=335,
 )
 
 
@@ -257,8 +252,8 @@ _NODESENDITEMTONEWNODEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=340,
-  serialized_end=390,
+  serialized_start=337,
+  serialized_end=387,
 )
 
 
@@ -282,14 +277,12 @@ _NODEEMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=392,
-  serialized_end=403,
+  serialized_start=389,
+  serialized_end=400,
 )
 
 _NODEGETREQUEST.fields_by_name['type'].enum_type = type__pb2._GETREQUESTTYPE
-_NODEGETREQUEST.oneofs_by_name['_value'].fields.append(
-  _NODEGETREQUEST.fields_by_name['value'])
-_NODEGETREQUEST.fields_by_name['value'].containing_oneof = _NODEGETREQUEST.oneofs_by_name['_value']
+_NODEGETREQUEST.fields_by_name['replica'].enum_type = type__pb2._DICTTYPE
 _NODEGETOBJECTSREPLY.oneofs_by_name['_key'].fields.append(
   _NODEGETOBJECTSREPLY.fields_by_name['key'])
 _NODEGETOBJECTSREPLY.fields_by_name['key'].containing_oneof = _NODEGETOBJECTSREPLY.oneofs_by_name['_key']
@@ -363,8 +356,8 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=406,
-  serialized_end=706,
+  serialized_start=403,
+  serialized_end=703,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_request',

@@ -23,7 +23,7 @@ class LoadBalancer():
     
     # TODO: allow lists as value inputs, 
     # Todo: values should automatically transform to str
-    def request(self,type,key,value=None):    
+    def request(self,type,key,values=[]):    
         '''
         gets a request from the user and calculates the responsible node
         and the forwards the request to this node
@@ -36,8 +36,13 @@ class LoadBalancer():
         # gets the router stub
         router_stub = self.get_random_router()
 
+        if list != type(values):
+            values = list(values)
+
+        # TODO: check if all elements int he list have type bytes or unicode
+
         # creates a request and gets the ip_address of a the responsible node
-        request = RH_pb2.RendezvousFindNodeRequest(type=type, key=key, value=value)
+        request = RH_pb2.RendezvousFindNodeRequest(type=type, key=key, values=values)
         response = router_stub.forward_to_responsible_node(request)
 
         if type == 1:

@@ -45,19 +45,15 @@ class TestRendezvousNodeMethods(unittest.TestCase):
     # TODO: look into why this is the case
     def test2_add(self):
         # add entries to the dict
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["24"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["24"])
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
-        self.stub.get_request(request)
-        self.tst_value_for_key("Sam", ["24", "14"])
-
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="42")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["14", "42"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["24", "14", "42"])
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",value="18")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",values=["18"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sand", ["18"])
 
@@ -77,7 +73,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def test4_delete(self):
         # delete a key that exists
-        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam",values=["24"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["14", "42"])
         
@@ -97,25 +93,25 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.tst_value_for_key("Sand", [])
 
         # add two times the same element
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["24"])
         self.stub.get_request(request)
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["24"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["24", "24"])
         
         # TODO: should it just delete the first occurance or all occurances???
         # delete element if it is 2 times in the list
-        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", values=["24"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["24"])
 
         # delete value what is not in the list
-        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", value="32")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Sam", values=["32"])
         self.stub.get_request(request)
         self.tst_value_for_key("Sam", ["24"])
 
         # delete value where key is not in list
-        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Test", value="24")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.DELETE,key="Test", values=["24"])
         self.stub.get_request(request)
         self.tst_value_for_key("Test", [])
 
@@ -130,19 +126,16 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.tst_value_for_key("Sam", [])
 
     def test5_send_item_to_new_node(self):
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["14"])
         self.stub.get_request(request)
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",value="34")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sand",values=["34"])
         self.stub.get_request(request)
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",values=["54", "612"])
         self.stub.get_request(request)
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="612")
-        self.stub.get_request(request)
-
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",values=["54"])
         self.stub.get_request(request)
 
         request = RN_pb2.NodeSendItemToNewNodeRequest(ip_address="172.17.0.5:50252")

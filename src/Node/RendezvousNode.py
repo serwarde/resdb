@@ -58,26 +58,26 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         channel = grpc.insecure_channel(request.ip_address)
         node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-        # we need to copy, else we get an error, that the dict changed in size if we delete anything
+        # copy dict, else we get an error, that the dict changed in size if we delete anything
         for key,vs in self._objects_dict.copy().items():
+            # calculates the hash value for the new node
             request_node = RN_pb2.NodeHashValueForRequest(key=key)
             newNodeValue = node_stub.hash_value_for_key(request_node)
-
+            
+            # if the hashvalue from the new node is higher, send the key to the node
             if newNodeValue.hashValue >= self.hash_value(key):
-
                 # we may have multiple values
                 # TODO: use stream instead of unique calls
                 # TODO: maybe store hash values of the keys?
-                for v in vs:
-                    request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,value=v)
-                    node_stub.get_request(request)
+                ngr = RN_pb2.NodeGetRequest(type=type_pb2.ADD, key=key, values=vs)
+                node_stub.get_request(ngr)
                                 
                 self.remove_object(self._objects_dict,key)
 
         return RN_pb2.NodeEmpty()
                 
 
-    def add_object(self, dict, key, value):
+    def add_object(self, dict, key, values):
         """
         not GRPC
 
@@ -87,9 +87,9 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         TODO: extend to working with dicts as values
         """
-        dict[key].append(value)
+        dict[key].extend(values)
 
-    def remove_object(self, dict, key, value=None):
+    def remove_object(self, dict, key, values=None):
         """
         not GRPC
 
@@ -100,11 +100,12 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         value = optional parameter, if a specific value/s should be deleted
         """
         if key in self._objects_dict:
-            if value:
-                try:
-                    dict[key].remove(value)
-                except ValueError:
-                    pass # do nothing if the value is not in the list
+            if values:
+                for value in values:
+                    try:
+                        dict[key].remove(value)
+                    except ValueError:
+                        pass # do nothing if the value is not in the list
             else:
                 del self._objects_dict[key]
 
@@ -155,20 +156,20 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         # add request
         if request.type == 0:
-            self.add_object(dict,request.key,request.value)
+            self.add_object(dict,request.key,request.values)
             return RN_pb2.NodeGetReply()
 
         # get request
         elif request.type == 1:
-            go = RN_pb2.NodeGetReply()
+            ngr = RN_pb2.NodeGetReply()
             # get request can be in either dictonary
-            go.values[:] = self.get_object(self._objects_dict, request.key)
-            go.values.extend(self.get_object(self._replica_dict, request.key))
-            return go
+            ngr.values[:] = self.get_object(self._objects_dict, request.key)
+            ngr.values.extend(self.get_object(self._replica_dict, request.key))
+            return ngr
 
         # delete request
         elif request.type == 2:
-            self.remove_object(dict, request.key,request.value)
+            self.remove_object(dict, request.key,request.values)
             return RN_pb2.NodeGetReply()
         
         

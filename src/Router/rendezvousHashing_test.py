@@ -60,48 +60,48 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def test2_find_responsible_node(self):
         # add KV for Sam. Sam is saved at Node0
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Sam",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Sam",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("Sam",["14"])
 
         # delete KV for Sam. Sam is saved at Node0
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="Sam",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="Sam",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("Sam",[])
 
         # add KV for bob1. bob1 is saved at Node1
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="bob1",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="bob1",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("bob1",["14"],1)
 
         # delete KV for bob1. bob1 is saved at Node1
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="bob1",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="bob1",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("bob1",[],1)
 
         # add KV for Nico. Nico is saved at Node2
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Nico",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Nico",values=["14", "78", "211", "1"])
         self.router_stub.forward_to_responsible_node(request)
-        self.tst_value_for_key("Nico",["14"],2)
+        self.tst_value_for_key("Nico",["14", "78", "211", "1"],2)
 
         # delete KV for Nico. Nico is saved at Node2
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="Nico",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.DELETE,key="Nico",values=["14", "78", "211", "1", "45"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("Nico",[],2)
 
     def test3_remove_node(self):
         # add KV for Sam. Sam is saved at Node0
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Sam",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Sam",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("Sam",["14"])
 
         # add KV for bob1. bob1 is saved at Node1
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="bob1",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="bob1",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("bob1",["14"],1)
 
         # add KV for Nico. Nico is saved at Node2
-        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Nico",value="14")
+        request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD,key="Nico",values=["14"])
         self.router_stub.forward_to_responsible_node(request)
         self.tst_value_for_key("Nico",["14"],2)
 
@@ -136,19 +136,16 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def add_helper(self):
         # adds keys in node 0
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",value="14")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Sam",values=["14"])
         self.node_stub0.get_request(request)
         
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="bob1",value="34")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="bob1",values=["34"])
         self.node_stub0.get_request(request)
         
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",values=["54", "612"])
         self.node_stub0.get_request(request)
         
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Nico",value="612")
-        self.node_stub0.get_request(request)
-        
-        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",value="54")
+        request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key="Serwar",values=["54"])
         self.node_stub0.get_request(request)
 
     def del_helper(self):

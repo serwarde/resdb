@@ -135,10 +135,9 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             
             channel = grpc.insecure_channel(champion_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
-
-            for v in vs:
-                request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,value=v)
-                node_stub.get_request(request)
+ 
+            request = RN_pb2.NodeGetRequest(type=type_pb2.ADD,key=key,values=vs)
+            node_stub.get_request(request)
 
         objects_on_node.clear()
         node_stub_del.remove_all(RN_pb2.NodeEmpty())
@@ -170,14 +169,14 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             if type == type_pb2.MAIN:
-                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value)
+                request = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values)
                 type = type_pb2.REPLICA
             
             elif type == type_pb2.REPLICA:
-                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=type)
+                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values, replica=type)
             
             elif type == type_pb2.UNSURE:
-                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, value=request.value, replica=type)
+                type = RN_pb2.NodeGetRequest(type=request.type, key=request.key, values=request.values, replica=type)
             
             # sends the request to the node
             response = node_stub.get_request(request)
@@ -186,8 +185,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             return RH_pb2.RendezvousFindNodeResponse()
 
         else:
-            fnd = RH_pb2.RendezvousFindNodeResponse()
-            fnd.values[:] = list(response.values)
+            fnd = RH_pb2.RendezvousFindNodeResponse(values=response.values)
             return fnd
 
     def find_responsible_node(self, key, dict_nodes_items, replica):

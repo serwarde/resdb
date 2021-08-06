@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"V\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\",\n\x1aRendezvousFindNodeResponse\x12\x0e\n\x06values\x18\x01 \x03(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xcd\x02\n\x11RendezvousHashing\x12X\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x1b.RendezvousFindNodeResponse\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x35\n\t_add_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x38\n\x0c_remove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
+  serialized_pb=b'\n\x17RendezvousHashing.proto\x1a\ntype.proto\"W\n\x19RendezvousFindNodeRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x0e\n\x06values\x18\x03 \x03(\t\",\n\x1aRendezvousFindNodeResponse\x12\x0e\n\x06values\x18\x01 \x03(\t\"9\n\x15RendezvousInformation\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\"\x11\n\x0fRendezvousEmpty2\xcd\x02\n\x11RendezvousHashing\x12X\n\x1b\x66orward_to_responsible_node\x12\x1a.RendezvousFindNodeRequest\x1a\x1b.RendezvousFindNodeResponse\"\x00\x12\x34\n\x08\x61\x64\x64_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x37\n\x0bremove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x35\n\t_add_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmpty\x12\x38\n\x0c_remove_node\x12\x16.RendezvousInformation\x1a\x10.RendezvousEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -50,9 +50,9 @@ _RENDEZVOUSFINDNODEREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='value', full_name='RendezvousFindNodeRequest.value', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='values', full_name='RendezvousFindNodeRequest.values', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -69,7 +69,7 @@ _RENDEZVOUSFINDNODEREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=39,
-  serialized_end=125,
+  serialized_end=126,
 )
 
 
@@ -100,8 +100,8 @@ _RENDEZVOUSFINDNODERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=127,
-  serialized_end=171,
+  serialized_start=128,
+  serialized_end=172,
 )
 
 
@@ -139,8 +139,8 @@ _RENDEZVOUSINFORMATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=173,
-  serialized_end=230,
+  serialized_start=174,
+  serialized_end=231,
 )
 
 
@@ -164,8 +164,8 @@ _RENDEZVOUSEMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=232,
-  serialized_end=249,
+  serialized_start=233,
+  serialized_end=250,
 )
 
 _RENDEZVOUSFINDNODEREQUEST.fields_by_name['type'].enum_type = type__pb2._GETREQUESTTYPE
@@ -212,8 +212,8 @@ _RENDEZVOUSHASHING = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=252,
-  serialized_end=585,
+  serialized_start=253,
+  serialized_end=586,
   methods=[
   _descriptor.MethodDescriptor(
     name='forward_to_responsible_node',
