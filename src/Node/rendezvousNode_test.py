@@ -133,6 +133,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.tst_value_for_key("Sam", [])
 
     def test5_send_item_to_new_node(self):
+        # adds iteams
         request = RN_pb2.NodeGetRequest(
             type=type_pb2.ADD, key="Sam", values=["14"])
         self.stub.get_request(request)

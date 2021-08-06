@@ -13,7 +13,7 @@ message NodeGetRequest {
     GetRequestType type = 1;
     string key = 2;
     repeated string values = 3;
-    DictType replica = 4;
+    int32 replica_number = 4;
 }
 
 message NodeGetReply {

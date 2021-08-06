@@ -19,9 +19,8 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         self._http_port = port
         self._node_weight = weight
         self._hashing = hashlib.md5
-        # TODO: Check if a list is a good representation for values
         self._objects_dict = defaultdict(list)
-        self._replica_dict = defaultdict(list)
+        self._replica_dict = defaultdict(lambda: defaultdict(list))
 
     def hash_value_for_key(self, request, context) -> float:
         """
@@ -33,6 +32,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         """
         return RN_pb2.NodeHashValueForReply(hashValue=self.hash_value(request.key))
 
+    # TODO: store hash values, to make it faster
     def hash_value(self, key) -> float:
         """
         returns the hash for a given key. Uses sha256 for creating the hash value. In the
@@ -59,23 +59,24 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         # copy dict, else we get an error, that the dict changed in size if we delete anything
         for key, vs in self._objects_dict.copy().items():
             # calculates the hash value for the new node
+
             request_node = RN_pb2.NodeHashValueForRequest(key=key)
             newNodeValue = node_stub.hash_value_for_key(request_node)
 
             # if the hashvalue from the new node is higher, send the key to the node
             if newNodeValue.hashValue >= self.hash_value(key):
                 # we may have multiple values
-                # TODO: use stream instead of unique calls
                 # TODO: maybe store hash values of the keys?
-                ngr = RN_pb2.NodeGetRequest(
-                    type=type_pb2.ADD, key=key, values=vs)
-                node_stub.get_request(ngr)
 
-                self.remove_object(self._objects_dict, key)
+                request = RN_pb2.NodeGetRequest(
+                    type=type_pb2.ADD, key=key, values=vs)
+                node_stub.get_request(request)
+
+                self.remove_object(key)
 
         return RN_pb2.NodeEmpty()
 
-    def add_object(self, dict, key, values):
+    def add_object(self, key, values, replica_number):
         """
         not GRPC
 
@@ -85,9 +86,14 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         TODO: extend to working with dicts as values
         """
-        dict[key].extend(values)
+        if not replica_number:
+            self._objects_dict[key].extend(values)
+        else:
+            self._replica_dict[replica_number][key].extend(values)
 
-    def remove_object(self, dict, key, values=None):
+
+
+    def remove_object(self, key, values=None, replica_number=0):
         """
         not GRPC
 
@@ -96,27 +102,53 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         key = the key from the object
         value = optional parameter, if a specific value/s should be deleted
+
         """
-        if key in dict:
-            if values:
-                for value in values:
-                    try:
-                        dict[key].remove(value)
-                    except ValueError:
-                        pass  # do nothing if the value is not in the list
-            else:
-                del self._objects_dict[key]
+        if replica_number == 0:
+            if key in self._objects_dict:
+                if values:
+                    for value in values:
+                        try:
+                            self._objects_dict[key].remove(value)
+                        except ValueError:
+                            pass  # do nothing if the value is not in the list
+                else:
+                    del self._objects_dict[key]
+
+        else:
+            if replica_number in self._replica_dict and key in self._replica_dict[replica_number]:
+                if values:
+                    for value in values:
+                        try:
+                            self._replica_dict[replica_number][key].remove(value)
+                        except ValueError:
+                            pass  # do nothing if the value is not in the list
+                else:
+                    del self._replica_dict[replica_number][key]
+
 
     # DONE: delete update object since it is not needed
-
-    def get_object(self, dict, key) -> Union[int, str, list, bool, tuple, dict]:
+    def get_object(self, key, replica_number) -> Union[int, str, list, bool, tuple, dict]:
         """
         not GRPC
 
         returns the values for a given key
         key = the key from the object
         """
-        return dict[key]
+        if replica_number == 0:
+            return self._objects_dict[key]
+        elif replica_number > 0:
+            return self._replica_dict[replica_number][key]
+        elif replica_number == -1:
+            values = self._objects_dict[key]
+            if values:
+                return
+            
+            for replica in self._replica_dict.copy().values():
+                if key in self._replica_dict[replica].keys():
+                    return self._replica_dict[replica][key]
+
+        return []
 
     def get_objects(self, request, context) -> dict:
         """
@@ -143,36 +175,23 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         value = only necessary for add and update
         """
 
-        #print("key: ",request.key, "values: ", request.values, " type:",request.type, " replica:", request.replica)
         print("object: ", self._objects_dict)
         print("replica: ", self._replica_dict)
 
-        if request.replica == 0:
-            dict = self._objects_dict
-        elif request.replica == 1:
-            dict = self._replica_dict
-        else:
-            dict = {}
-
         # add request
         if request.type == 0:
-            self.add_object(dict, request.key, request.values)
+            self.add_object(request.key, request.values, request.replica_number)
             return RN_pb2.NodeGetReply()
 
         # get request
         elif request.type == 1: 
             # get request can be in either dictonary
-            if dict:
-                ngr = RN_pb2.NodeGetReply(values=self.get_object(dict, request.key))
-            else:
-                ngr = RN_pb2.NodeGetReply()
-                ngr.values[:] = self.get_object(self._objects_dict, request.key)
-                ngr.values.extend(self.get_object(self._replica_dict, request.key))
+            ngr = RN_pb2.NodeGetReply(values=self.get_object(request.key, request.replica_number))
             return ngr
 
         # delete request
         elif request.type == 2:
-            self.remove_object(dict, request.key, request.values)
+            self.remove_object(request.key, request.values, request.replica_number)
             return RN_pb2.NodeGetReply()
 
 

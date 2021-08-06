@@ -5,9 +5,3 @@ enum GetRequestType {
     GET = 1;
     DELETE = 2;
 }
-
-enum DictType {
-    MAIN = 0;
-    REPLICA = 1;
-    UNSURE = 2;
-}

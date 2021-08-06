@@ -159,33 +159,29 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         tmp_dict_items = self._dict_nodes.copy().items()
 
+        replica_unsure = False
+
         # if it is a get request, just take a subset
         if request.type == 1:
             ip_from_champions = self.find_responsible_node(request.key, random.sample(
                 tmp_dict_items, len(tmp_dict_items)-self.replica))
-            type = type_pb2.UNSURE
+            replica_unsure = True
         else:
             ip_from_champions = self.find_responsible_node(
                 request.key, tmp_dict_items, self.replica)
-            type = type_pb2.MAIN
 
-        for ip in ip_from_champions:
+        for id, ip in enumerate(ip_from_champions):
             # creates a connection
             channel = grpc.insecure_channel(ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-            if type == type_pb2.MAIN:
+            if not replica_unsure:
                 request = RN_pb2.NodeGetRequest(
-                    type=request.type, key=request.key, values=request.values)
-                type = type_pb2.REPLICA
+                    type=request.type, key=request.key, values=request.values, replica_number=id)
 
-            elif type == type_pb2.REPLICA:
+            else:
                 request = RN_pb2.NodeGetRequest(
-                    type=request.type, key=request.key, values=request.values, replica=type)
-
-            elif type == type_pb2.UNSURE:
-                request = RN_pb2.NodeGetRequest(
-                    type=request.type, key=request.key, values=request.values, replica=type)
+                    type=request.type, key=request.key, values=request.values, replica_number=-1)
 
             # sends the request to the node
             response = node_stub.get_request(request)

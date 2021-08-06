@@ -138,7 +138,7 @@ class TestRendezvousNodeMethods(unittest.TestCase):
 
     def tst_value_for_key(self, key, values, stub=0, storage=0):
 
-        request = RN_pb2.NodeGetRequest(type=type_pb2.GET, key=key, replica=storage)
+        request = RN_pb2.NodeGetRequest(type=type_pb2.GET, key=key, replica_number=storage)
         if stub == 0:
             response = self.node_stub0.get_request(request)
         elif stub == 1:
