@@ -38,8 +38,13 @@ class LoadBalancer():
 
         if list != type(values):
             values = list(values)
+        
+        # Done: check if all elements int he list have type bytes or unicode
+        all_elements_bytes = False
+        for v in values:
+            all_elements_bytes = isinstance(v,(bytes, bytearray, unicode))
+        print("All elements in list are bytes of unicode: ", all_elements_bytes)
 
-        # TODO: check if all elements int he list have type bytes or unicode
 
         # creates a request and gets the ip_address of a the responsible node
         request = RH_pb2.RendezvousFindNodeRequest(type=type, key=key, values=values)
