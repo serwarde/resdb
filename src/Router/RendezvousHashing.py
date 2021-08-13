@@ -176,22 +176,21 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
             if not replica_unsure:
-                request = RN_pb2.NodeGetRequest(
+                request_get = RN_pb2.NodeGetRequest(
                     type=request.type, key=request.key, values=request.values, replica_number=id)
 
             else:
-                request = RN_pb2.NodeGetRequest(
+                request_get = RN_pb2.NodeGetRequest(
                     type=request.type, key=request.key, values=request.values, replica_number=-1)
 
             # sends the request to the node
-            response = node_stub.get_request(request)
+            response = node_stub.get_request(request_get)
 
         if request.type != 1:
             return RH_pb2.RendezvousFindNodeResponse()
 
         else:
-            fnd = RH_pb2.RendezvousFindNodeResponse(values=response.values)
-            return fnd
+            return RH_pb2.RendezvousFindNodeResponse(values=response.values)
 
     def find_responsible_node(self, key, dict_nodes_items, n_highest=0):
         dict = {}

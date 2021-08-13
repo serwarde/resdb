@@ -36,9 +36,6 @@ class LoadBalancer():
         # gets the router stub
         router_stub = self.get_random_router()
 
-        if list != type(values):
-            values = list(values)
-
         # TODO: check if all elements int he list have type bytes or unicode
 
         # creates a request and gets the ip_address of a the responsible node

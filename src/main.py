@@ -53,14 +53,14 @@ print("Add node0. Number of nodes=1")
 lb.add_node("node0","172.17.0.4","50251")
 
 print("Add Nico, Sam and Server. Number of nodes=1") 
-lb.request(type=type_pb2.ADD,key="Nico",values=["57","Test"])
+lb.request(type=type_pb2.ADD,key="Nico",values=["57", "test"])
 lb.request(type=type_pb2.ADD,key="Sam",values=["12"])
 lb.request(type=type_pb2.ADD,key="bob1",values=["42"])
 show_all_responses()
 
-print("GET: Nico, Values: ", list(lb.request(type=type_pb2.GET,key="Nico").values))
 print("Add node1. Number of nodes=2") 
 lb.add_node("node1","172.17.0.5","50252")
+print("GET: Nico, Values: ", list(lb.request(type=type_pb2.GET,key="Nico").values))
 show_all_responses()
 
 print("GET: Nico, Values: ", list(lb.request(type=type_pb2.GET,key="Nico").values))
