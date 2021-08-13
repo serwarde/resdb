@@ -140,7 +140,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             request = RN_pb2.NodeGetRequest(
                 type=type_pb2.ADD, key=key, values=vs)
             node_stub.get_request(request)
-        	
+
         # clears the created dict
         objects_on_node.clear()
         # removes all elements
@@ -170,21 +170,25 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             ip_from_champions = self.find_responsible_node(
                 request.key, tmp_dict_items, self.replica)
 
-        for id, ip in enumerate(ip_from_champions):
-            # creates a connection
-            channel = grpc.insecure_channel(ip)
-            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+        if len(ip_from_champions) > len(self._dict_nodes):
+            print("ERROR: Number of requested replicas exceeds the number of available nodes")
+            return None
+        else:
+            for id, ip in enumerate(ip_from_champions):
+                # creates a connection
+                channel = grpc.insecure_channel(ip)
+                node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-            if not replica_unsure:
-                request_get = RN_pb2.NodeGetRequest(
-                    type=request.type, key=request.key, values=request.values, replica_number=id)
+                if not replica_unsure:
+                    request_get = RN_pb2.NodeGetRequest(
+                        type=request.type, key=request.key, values=request.values, replica_number=id)
 
-            else:
-                request_get = RN_pb2.NodeGetRequest(
-                    type=request.type, key=request.key, values=request.values, replica_number=-1)
+                else:
+                    request_get = RN_pb2.NodeGetRequest(
+                        type=request.type, key=request.key, values=request.values, replica_number=-1)
 
-            # sends the request to the node
-            response = node_stub.get_request(request_get)
+                # sends the request to the node
+                response = node_stub.get_request(request_get)
 
         if request.type != 1:
             return RH_pb2.RendezvousFindNodeResponse()
