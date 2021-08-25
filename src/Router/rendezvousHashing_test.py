@@ -146,9 +146,11 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         else:
             response = self.node_stub2.get_request(request)
 
-        x = list(response.values)
+        response_values = list(response.values)
+
         #self.assertEqual(len(values), len(x), "len(values) != len(responses)")
-        self.assertListEqual(values, x)
+        #self.assertIn(values, x)
+        self.assertTrue(all(v in response_values for v in values))
 
     def add_helper(self):
         # adds keys in node 0
