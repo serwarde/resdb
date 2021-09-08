@@ -1,7 +1,7 @@
 import argparse
 import random
 import socket
-from collections import defaultdict
+from collections import defaultdict, Counter
 from concurrent import futures
 
 import grpc
@@ -171,7 +171,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                 request.key, tmp_dict_items, self.replica)
 
         if len(ip_from_champions) > len(self._dict_nodes):
-            print("ERROR: Number of requested replicas exceeds the number of available nodes")
+            print(
+                "ERROR: Number of requested replicas exceeds the number of available nodes")
             return None
         else:
             for id, ip in enumerate(ip_from_champions):
@@ -192,9 +193,9 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         if request.type != 1:
             return RH_pb2.RendezvousFindNodeResponse()
-
         else:
             return RH_pb2.RendezvousFindNodeResponse(values=response.values)
+
 
     def find_responsible_node(self, key, dict_nodes_items, n_highest=0):
         dict = {}
@@ -216,6 +217,38 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # It is in order therefore is the first node the champion
         return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
 
+    
+    def failure_handling(self,):
+        """
+        Gets called incase a node is not responsive
+        """
+
+        main_kv_pairs = []
+        replica_kv_pairs = []
+        
+        for _, n_ip in self._dict_nodes.items():
+            # note: a node tuple consists of an ip_address and name
+            # connect to the node
+            channel = grpc.insecure_channel(n_ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+
+            # get list of keys from node and extend the corresponding list
+            request_node = RN_pb2.NodeEmpty()
+            responses = node_stub.get_objects(request_node)
+            main_kv_pairs.extend([r for r in responses])
+
+            request_node = RN_pb2.NodeEmpty()
+            responses = node_stub.get_replicas(request_node)
+            replica_kv_pairs.extend([r for r in responses])
+
+        missing_main_keys = list(set(main_kv_pairs).symmetric_difference(set(replica_kv_pairs)))
+        missing_replica_keys = []
+
+        for key, value in dict(Counter(replica_kv_pairs)).items():
+            if value < self.replica:
+                missing_replica_keys.append(key)
+
+        self.redistribute_missing_keys(missing_main_keys, missing_replica_keys)
 
 def serve(ip_address, port):
     # starts the grpc server
