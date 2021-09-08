@@ -212,10 +212,9 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         else:
             response = self.stub2.get_request(request)
 
-        response_values = list(response.values)
-        #self.assertEqual(len(values), len(x), "len(values) != len(responses)")
-        #self.assertIn(values, x)
-        self.assertTrue(all(v in response_values for v in values))
+        x = list(response.values)
+        self.assertEqual(len(values), len(x), "len(values) != len(responses)")
+        self.assertListEqual(values, x)
 
 if __name__ == '__main__':
     unittest.main()
