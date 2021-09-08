@@ -218,10 +218,12 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
 
     
-    def failure_handling(self,):
+    def failure_handling(self, failed_node):
         """
         Gets called incase a node is not responsive
         """
+
+        del self._dict_nodes[failed_node]
 
         main_kv_pairs = []
         replica_kv_pairs = []
@@ -241,6 +243,8 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             responses = node_stub.get_replicas(request_node)
             replica_kv_pairs.extend([r for r in responses])
 
+
+        # Note: we store in two different lists incase we find a better solution for how to redistribute keys
         missing_main_keys = list(set(main_kv_pairs).symmetric_difference(set(replica_kv_pairs)))
         missing_replica_keys = []
 
@@ -249,6 +253,36 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
                 missing_replica_keys.append(key)
 
         self.redistribute_missing_keys(missing_main_keys, missing_replica_keys)
+
+
+    def redistribute_missing_keys(self, missing_main_keys, missing_replica_keys):
+        """
+        Redistribute missing keys after node failure
+        """
+
+        for k in missing_main_keys:
+            # Gets the corresponding values of a missing key from one of the replicas
+            request = RN_pb2.NodeGetRequest(type=1, key=k, replica_number=-1)
+            response = self.forward_to_responsible_node(request)
+
+            #TODO: Delete all replica instances from the network before re-adding it (or find a better solution)
+
+            # Re-add the missing key to the network
+            request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD, key=k, values=list(response.values))
+            self.forward_to_responsible_node(request)
+
+        for k in missing_replica_keys:
+            # Gets the corresponding values of a missing key from one of the replicas
+            request = RN_pb2.NodeGetRequest(type=1, key=k, replica_number=-1)
+            response = self.forward_to_responsible_node(request)
+
+            #TODO: We probably only need to add an extra replica, but this work for now (albeit logically incorrectly)
+
+            # Re-add the missing key to the network
+            request = RH_pb2.RendezvousFindNodeRequest(type=type_pb2.ADD, key=k, values=list(response.values))
+            self.forward_to_responsible_node(request)
+
+
 
 def serve(ip_address, port):
     # starts the grpc server
