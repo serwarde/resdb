@@ -100,41 +100,41 @@ class TestRendezvousNodeMethods(unittest.TestCase):
         self.tst_value_for_key("Nico", [], 2)
         self.tst_value_for_key("Nico", [], 1, 1)
 
-    # def test3_remove_node(self):
-    #     # add KV for Sam. Sam is saved at Node0
-    #     request = RH_pb2.RendezvousFindNodeRequest(
-    #         type=type_pb2.ADD, key="Sam", values=["14"])
-    #     self.router_stub.forward_to_responsible_node(request)
-    #     self.tst_value_for_key("Sam", ["14"])
+    def test3_remove_node(self):
+        # add KV for Sam. Sam is saved at Node0
+        request = RH_pb2.RendezvousFindNodeRequest(
+            type=type_pb2.ADD, key="Sam", values=["14"])
+        self.router_stub.forward_to_responsible_node(request)
+        self.tst_value_for_key("Sam", ["14"])
 
-    #     # add KV for bob1. bob1 is saved at Node1
-    #     request = RH_pb2.RendezvousFindNodeRequest(
-    #         type=type_pb2.ADD, key="bob1", values=["14"])
-    #     self.router_stub.forward_to_responsible_node(request)
-    #     self.tst_value_for_key("bob1", ["14"], 1)
+        # add KV for bob1. bob1 is saved at Node1
+        request = RH_pb2.RendezvousFindNodeRequest(
+            type=type_pb2.ADD, key="bob1", values=["14"])
+        self.router_stub.forward_to_responsible_node(request)
+        self.tst_value_for_key("bob1", ["14"], 1)
 
-    #     # add KV for Nico. Nico is saved at Node2
-    #     request = RH_pb2.RendezvousFindNodeRequest(
-    #         type=type_pb2.ADD, key="Nico", values=["14"])
-    #     self.router_stub.forward_to_responsible_node(request)
-    #     self.tst_value_for_key("Nico", ["14"], 2)
+        # add KV for Nico. Nico is saved at Node2
+        request = RH_pb2.RendezvousFindNodeRequest(
+            type=type_pb2.ADD, key="Nico", values=["14"])
+        self.router_stub.forward_to_responsible_node(request)
+        self.tst_value_for_key("Nico", ["14"], 2)
 
-    #     # remove node
-    #     request = RH_pb2.RendezvousInformation(
-    #         name="node2", ip_address="172.17.0.6:50253")
-    #     self.router_stub.remove_node(request)
-    #     self.tst_value_for_key("Nico", ["14"], 1)
-    #     self.tst_value_for_key("bob1", ["14"], 1)
-    #     self.tst_value_for_key("Nico", [], 2)
+        # remove node
+        request = RH_pb2.RendezvousInformation(
+            name="node2", ip_address="172.17.0.6:50253")
+        self.router_stub.remove_node(request)
+        self.tst_value_for_key("Nico", ["14"], 1)
+        self.tst_value_for_key("bob1", ["14"], 1)
+        self.tst_value_for_key("Nico", [], 2)
 
-    #     request = RH_pb2.RendezvousInformation(
-    #         name="node1", ip_address="172.17.0.5:50252")
-    #     self.router_stub.remove_node(request)
-    #     self.tst_value_for_key("Sam", ["14"])
-    #     self.tst_value_for_key("Nico", ["14"])
-    #     self.tst_value_for_key("bob1", ["14"])
-    #     self.tst_value_for_key("bob1", [], 1)
-    #     self.tst_value_for_key("Nico", [], 1)
+        request = RH_pb2.RendezvousInformation(
+            name="node1", ip_address="172.17.0.5:50252")
+        self.router_stub.remove_node(request)
+        self.tst_value_for_key("Sam", ["14"])
+        self.tst_value_for_key("Nico", ["14"])
+        self.tst_value_for_key("bob1", ["14"])
+        self.tst_value_for_key("bob1", [], 1)
+        self.tst_value_for_key("Nico", [], 1)
 
     def tst_value_for_key(self, key, values, stub=0, storage=0):
 
