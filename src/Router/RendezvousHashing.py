@@ -25,7 +25,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.set_nodes()
-        self.replica = 1
+        self.replica = 2
 
     def set_nodes(self):
         """
@@ -254,17 +254,18 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # Note: we store in two different lists incase we find a better solution for how to redistribute keys
         missing_main_keys = list(
             set(main_kv_pairs).symmetric_difference(set(replica_kv_pairs)))
-        #TODO: This part should be functional, but we need more nodes and a higher replica limit to test it properly
-        #missing_replica_keys = []
+        
+        #Done: This part should be functional, but we need more nodes and a higher replica limit to test it properly
+        missing_replica_keys = []
 
-        #for key, value in dict(Counter(replica_kv_pairs)).items():
-        #    if value < self.replica:
-        #        missing_replica_keys.append(key)
+        for key, value in dict(Counter(replica_kv_pairs)).items():
+            if value < self.replica:
+                missing_replica_keys.append(key)
 
         print("Missing Primary Keys after the failure of {}:".format(failed_node))
         print(missing_main_keys)
-        #print("Missing Replica Keys after the failure of {}:".format(failed_node))
-        #print(missing_replica_keys)
+        print("Missing Replica Keys after the failure of {}:".format(failed_node))
+        print(missing_replica_keys)
 
         # TODO: This part is experimental but should be functional, please refer to the above TODO
         #self.redistribute_missing_keys(missing_main_keys, missing_replica_keys)
