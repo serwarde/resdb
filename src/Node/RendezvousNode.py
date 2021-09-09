@@ -91,8 +91,6 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         else:
             self._replica_dict[replica_number][key].extend(values)
 
-
-
     def remove_object(self, key, values=None, replica_number=0):
         """
         not GRPC
@@ -120,14 +118,15 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
                 if values:
                     for value in values:
                         try:
-                            self._replica_dict[replica_number][key].remove(value)
+                            self._replica_dict[replica_number][key].remove(
+                                value)
                         except ValueError:
                             pass  # do nothing if the value is not in the list
                 else:
                     del self._replica_dict[replica_number][key]
 
-
     # DONE: delete update object since it is not needed
+
     def get_object(self, key, replica_number) -> Union[int, str, list, bool, tuple, dict]:
         """
         not GRPC
@@ -143,7 +142,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             values = self._objects_dict[key]
             if values:
                 return
-            
+
             for replica in self._replica_dict.copy().values():
                 if key in self._replica_dict[replica].keys():
                     return self._replica_dict[replica][key]
@@ -153,11 +152,17 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
     def get_objects(self, request, context) -> dict:
         """
         GRPC
-
-        returns all objects in node
+        returns all main keys in node
         """
-        for key, values in self._objects_dict.copy().items():
-            yield RN_pb2.NodeGetObjectsReply(key=key, values=values)
+        yield RN_pb2.NodeGetObjectsReply(key="NONE", values=list(self._objects_dict.copy()))
+
+    def get_replicas(self, request, context) -> dict:
+        """
+        GRPC
+        returns all replica keys in node
+        """
+        for kv_pairs in self._replica_dict.copy().values():
+            yield RN_pb2.NodeGetObjectsReply(key="NONE", values=list(kv_pairs.copy()))
 
     def remove_all(self, request, context):
         self._objects_dict.clear()
@@ -180,18 +185,21 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
 
         # add request
         if request.type == 0:
-            self.add_object(request.key, request.values, request.replica_number)
+            self.add_object(request.key, request.values,
+                            request.replica_number)
             return RN_pb2.NodeGetReply()
 
         # get request
-        elif request.type == 1: 
+        elif request.type == 1:
             # get request can be in either dictonary
-            ngr = RN_pb2.NodeGetReply(values=self.get_object(request.key, request.replica_number))
+            ngr = RN_pb2.NodeGetReply(values=self.get_object(
+                request.key, request.replica_number))
             return ngr
 
         # delete request
         elif request.type == 2:
-            self.remove_object(request.key, request.values, request.replica_number)
+            self.remove_object(request.key, request.values,
+                               request.replica_number)
             return RN_pb2.NodeGetReply()
 
 
