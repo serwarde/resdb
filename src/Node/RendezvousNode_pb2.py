@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"d\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x0e\n\x06values\x18\x03 \x03(\t\x12\x16\n\x0ereplica_number\x18\x04 \x01(\x05\"\x1e\n\x0cNodeGetReply\x12\x0e\n\x06values\x18\x01 \x03(\t\"?\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x0e\n\x06values\x18\x02 \x03(\tB\x06\n\x04_key\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\xac\x02\n\x0eRendezvousNode\x12/\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x12$\n\nremove_all\x12\n.NodeEmpty\x1a\n.NodeEmptyb\x06proto3'
+  serialized_pb=b'\n\x14RendezvousNode.proto\x1a\ntype.proto\"d\n\x0eNodeGetRequest\x12\x1d\n\x04type\x18\x01 \x01(\x0e\x32\x0f.GetRequestType\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\x0e\n\x06values\x18\x03 \x03(\t\x12\x16\n\x0ereplica_number\x18\x04 \x01(\x05\"\x1e\n\x0cNodeGetReply\x12\x0e\n\x06values\x18\x01 \x03(\t\"?\n\x13NodeGetObjectsReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x0e\n\x06values\x18\x02 \x03(\tB\x06\n\x04_key\"@\n\x14NodeGetReplicasReply\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x0e\n\x06values\x18\x02 \x03(\tB\x06\n\x04_key\"&\n\x17NodeHashValueForRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"*\n\x15NodeHashValueForReply\x12\x11\n\thashValue\x18\x01 \x01(\x02\"2\n\x1cNodeSendItemToNewNodeRequest\x12\x12\n\nip_address\x18\x01 \x01(\t\"\x0b\n\tNodeEmpty2\xe3\x02\n\x0eRendezvousNode\x12/\n\x0bget_request\x12\x0f.NodeGetRequest\x1a\r.NodeGetReply\"\x00\x12\x33\n\x0bget_objects\x12\n.NodeEmpty\x1a\x14.NodeGetObjectsReply\"\x00\x30\x01\x12\x35\n\x0cget_replicas\x12\n.NodeEmpty\x1a\x15.NodeGetReplicasReply\"\x00\x30\x01\x12H\n\x12hash_value_for_key\x12\x18.NodeHashValueForRequest\x1a\x16.NodeHashValueForReply\"\x00\x12\x44\n\x15send_item_to_new_node\x12\x1d.NodeSendItemToNewNodeRequest\x1a\n.NodeEmpty\"\x00\x12$\n\nremove_all\x12\n.NodeEmpty\x1a\n.NodeEmptyb\x06proto3'
   ,
   dependencies=[type__pb2.DESCRIPTOR,])
 
@@ -156,6 +156,50 @@ _NODEGETOBJECTSREPLY = _descriptor.Descriptor(
 )
 
 
+_NODEGETREPLICASREPLY = _descriptor.Descriptor(
+  name='NodeGetReplicasReply',
+  full_name='NodeGetReplicasReply',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='NodeGetReplicasReply.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='values', full_name='NodeGetReplicasReply.values', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='_key', full_name='NodeGetReplicasReply._key',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=235,
+  serialized_end=299,
+)
+
+
 _NODEHASHVALUEFORREQUEST = _descriptor.Descriptor(
   name='NodeHashValueForRequest',
   full_name='NodeHashValueForRequest',
@@ -183,8 +227,8 @@ _NODEHASHVALUEFORREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=235,
-  serialized_end=273,
+  serialized_start=301,
+  serialized_end=339,
 )
 
 
@@ -215,8 +259,8 @@ _NODEHASHVALUEFORREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=275,
-  serialized_end=317,
+  serialized_start=341,
+  serialized_end=383,
 )
 
 
@@ -247,8 +291,8 @@ _NODESENDITEMTONEWNODEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=319,
-  serialized_end=369,
+  serialized_start=385,
+  serialized_end=435,
 )
 
 
@@ -272,17 +316,21 @@ _NODEEMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=371,
-  serialized_end=382,
+  serialized_start=437,
+  serialized_end=448,
 )
 
 _NODEGETREQUEST.fields_by_name['type'].enum_type = type__pb2._GETREQUESTTYPE
 _NODEGETOBJECTSREPLY.oneofs_by_name['_key'].fields.append(
   _NODEGETOBJECTSREPLY.fields_by_name['key'])
 _NODEGETOBJECTSREPLY.fields_by_name['key'].containing_oneof = _NODEGETOBJECTSREPLY.oneofs_by_name['_key']
+_NODEGETREPLICASREPLY.oneofs_by_name['_key'].fields.append(
+  _NODEGETREPLICASREPLY.fields_by_name['key'])
+_NODEGETREPLICASREPLY.fields_by_name['key'].containing_oneof = _NODEGETREPLICASREPLY.oneofs_by_name['_key']
 DESCRIPTOR.message_types_by_name['NodeGetRequest'] = _NODEGETREQUEST
 DESCRIPTOR.message_types_by_name['NodeGetReply'] = _NODEGETREPLY
 DESCRIPTOR.message_types_by_name['NodeGetObjectsReply'] = _NODEGETOBJECTSREPLY
+DESCRIPTOR.message_types_by_name['NodeGetReplicasReply'] = _NODEGETREPLICASREPLY
 DESCRIPTOR.message_types_by_name['NodeHashValueForRequest'] = _NODEHASHVALUEFORREQUEST
 DESCRIPTOR.message_types_by_name['NodeHashValueForReply'] = _NODEHASHVALUEFORREPLY
 DESCRIPTOR.message_types_by_name['NodeSendItemToNewNodeRequest'] = _NODESENDITEMTONEWNODEREQUEST
@@ -309,6 +357,13 @@ NodeGetObjectsReply = _reflection.GeneratedProtocolMessageType('NodeGetObjectsRe
   # @@protoc_insertion_point(class_scope:NodeGetObjectsReply)
   })
 _sym_db.RegisterMessage(NodeGetObjectsReply)
+
+NodeGetReplicasReply = _reflection.GeneratedProtocolMessageType('NodeGetReplicasReply', (_message.Message,), {
+  'DESCRIPTOR' : _NODEGETREPLICASREPLY,
+  '__module__' : 'RendezvousNode_pb2'
+  # @@protoc_insertion_point(class_scope:NodeGetReplicasReply)
+  })
+_sym_db.RegisterMessage(NodeGetReplicasReply)
 
 NodeHashValueForRequest = _reflection.GeneratedProtocolMessageType('NodeHashValueForRequest', (_message.Message,), {
   'DESCRIPTOR' : _NODEHASHVALUEFORREQUEST,
@@ -347,8 +402,8 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=385,
-  serialized_end=685,
+  serialized_start=451,
+  serialized_end=806,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_request',
@@ -371,9 +426,19 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
+    name='get_replicas',
+    full_name='RendezvousNode.get_replicas',
+    index=2,
+    containing_service=None,
+    input_type=_NODEEMPTY,
+    output_type=_NODEGETREPLICASREPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
     name='hash_value_for_key',
     full_name='RendezvousNode.hash_value_for_key',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_NODEHASHVALUEFORREQUEST,
     output_type=_NODEHASHVALUEFORREPLY,
@@ -383,7 +448,7 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='send_item_to_new_node',
     full_name='RendezvousNode.send_item_to_new_node',
-    index=3,
+    index=4,
     containing_service=None,
     input_type=_NODESENDITEMTONEWNODEREQUEST,
     output_type=_NODEEMPTY,
@@ -393,7 +458,7 @@ _RENDEZVOUSNODE = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='remove_all',
     full_name='RendezvousNode.remove_all',
-    index=4,
+    index=5,
     containing_service=None,
     input_type=_NODEEMPTY,
     output_type=_NODEEMPTY,
