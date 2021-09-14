@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import socket
+import json
 from collections import defaultdict
 from concurrent import futures
 from typing import Union
@@ -27,7 +28,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         GRPC
 
         returns the hash for a given key. Uses sha256 for creating the hash value. In the
-        hash function the seed is appended to key. The hash is then converted to int and then 
+        hash function the seed is appended to key. The hash is then converted to int and then
         multplied by the node weight
         """
         return RN_pb2.NodeHashValueForReply(hashValue=self.hash_value(request.key))
@@ -36,20 +37,23 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
     def hash_value(self, key) -> float:
         """
         returns the hash for a given key. Uses sha256 for creating the hash value. In the
-        hash function the seed is appended to key. The hash is then converted to int and then 
+        hash function the seed is appended to key. The hash is then converted to int and then
         multplied by the node weight
         """
-        hash = self._hashing((key+self._host_ip).encode('utf-8')).hexdigest()
-        return float.fromhex(hash) * self._node_weight
+        hash = self._hashing((key+self._host_ip+":"+str(self._http_port)).encode('utf-8')).hexdigest()
+        return int(hash, 16)
+        # NOTE: Edited out node weights to accommodate distributing processing in case of failure easier
+        # This is however only temporary and not strictly necessary but was only made to avoid bigger changes in code base
+        #return float.fromhex(hash) * self._node_weight
 
     # Done: implement as a GRPC function. Since it needs to connect to the other node.
     def send_item_to_new_node(self, request, context):
         """
         GRPC
 
-        this function is called when we add a new node. It loops over all keys in its own 
-        dict and checks if the hashValue of the new Node is higher then the own. If yes it 
-        sends the key, value pair to the new node, where it now is stored. After sending it 
+        this function is called when we add a new node. It loops over all keys in its own
+        dict and checks if the hashValue of the new Node is higher then the own. If yes it
+        sends the key, value pair to the new node, where it now is stored. After sending it
         deletes the kv-pair in the own dictionary
         """
 
@@ -95,7 +99,7 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         """
         not GRPC
 
-        removes a object from the dict, 
+        removes a object from the dict,
         if a value is given it just removes the value/s for the key
 
         key = the key from the object
@@ -169,6 +173,26 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         self._replica_dict.clear()
         return RN_pb2.NodeEmpty()
 
+    def inspect_lost_entries(self, request, context):
+        """
+        GRPC
+
+        Nodes gets a request containing the ip_address of the failed node
+        then checks in its list if it has any replicas (or original entries) for it
+
+        ip_address = ip adress of the failed node
+        """
+
+        print("\n\n\n=========================")
+        print("Keys comparison:")
+        for key, value in self._replica_dict.copy().items():
+            if (key == 1):
+                for k, v in value.copy().items():
+                    if ((int(self._hashing((k+request.ip_address).encode('utf-8')).hexdigest(), 16)) > (self.hash_value(k))):
+                        print("Key: ", k, " with values: ", v, " was lost because of the failed node")
+        print("\n\n\n")
+        return RN_pb2.NodeEmpty()
+
     def get_request(self, request, context):
         """
         GRPC
@@ -180,13 +204,14 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
         value = only necessary for add and update
         """
 
-        print("object: ", self._objects_dict)
-        print("replica: ", self._replica_dict)
-
         # add request
         if request.type == 0:
             self.add_object(request.key, request.values,
                             request.replica_number)
+            print("Main Keys on node:")
+            print(json.dumps(self._objects_dict, indent=3))
+            print("Replica Keys on node:")
+            print(json.dumps(self._replica_dict, indent=3))
             return RN_pb2.NodeGetReply()
 
         # get request
@@ -194,12 +219,20 @@ class RendezvousNode(AbstractNodeClass, RN_pb2_grpc.RendezvousNodeServicer):
             # get request can be in either dictonary
             ngr = RN_pb2.NodeGetReply(values=self.get_object(
                 request.key, request.replica_number))
+            print("Main Keys on node:")
+            print(json.dumps(self._objects_dict, indent=3))
+            print("Replica Keys on node:")
+            print(json.dumps(self._replica_dict, indent=3))
             return ngr
 
         # delete request
         elif request.type == 2:
             self.remove_object(request.key, request.values,
                                request.replica_number)
+            print("Main Keys on node:")
+            print(json.dumps(self._objects_dict, indent=4))
+            print("Replica Keys on node:")
+            print(json.dumps(self._replica_dict, indent=4))
             return RN_pb2.NodeGetReply()
 
 

@@ -5,6 +5,7 @@ service RendezvousNode {
     rpc get_request (NodeGetRequest) returns (NodeGetReply) {};  
     rpc get_objects (NodeEmpty) returns (stream NodeGetObjectsReply) {};   
     rpc get_replicas (NodeEmpty) returns (stream NodeGetReplicasReply) {};  
+    rpc inspect_lost_entries(NodeGetLostEntriesRequest) returns (NodeEmpty) {};
     rpc hash_value_for_key (NodeHashValueForRequest) returns (NodeHashValueForReply) {};
     rpc send_item_to_new_node (NodeSendItemToNewNodeRequest) returns (NodeEmpty) {};
     rpc remove_all (NodeEmpty) returns (NodeEmpty);
@@ -19,6 +20,10 @@ message NodeGetRequest {
 
 message NodeGetReply {
     repeated string values = 1;
+}
+
+message NodeGetLostEntriesRequest{
+    string ip_address = 1;
 }
 
 message NodeGetObjectsReply {

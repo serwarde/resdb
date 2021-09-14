@@ -219,12 +219,26 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         except grpc.RpcError as e:
             status_code = e.code()
             if grpc.StatusCode.UNAVAILABLE == status_code:
-                self.failure_handling(n_name)
+                self.failure_handling_distributed_processing(n_name, n_ip)
             return -1
         else:
             # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.
             # It is in order therefore is the first node the champion
             return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
+
+    def failure_handling_distributed_processing(self, n_name, failed_node):
+        """
+        Another way or handling failure
+        """
+        print("Warning: Node Failure on ", failed_node)
+        del self._dict_nodes[n_name]
+        print(self._dict_nodes)
+
+        for _, n_ip in self._dict_nodes.copy().items():
+            channel = grpc.insecure_channel(n_ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+            request = RN_pb2.NodeGetLostEntriesRequest(ip_address = failed_node)
+            node_stub.inspect_lost_entries(request)
 
     def failure_handling(self, failed_node):
         """
