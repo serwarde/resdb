@@ -38,9 +38,9 @@ docker rmi rendezvoushashing1
 printf '%.s-' {1..100}
 printf " deltes Node Servers "
 printf '%.s-' {1..100}; echo ""
-docker stop rendezvousNode0 rendezvousNode1 rendezvousNode2 
-docker rm rendezvousNode0 rendezvousNode1 rendezvousNode2
-docker rmi rendezvousnode0 rendezvousnode1 rendezvousnode2
+docker stop rendezvousNode0 rendezvousNode1 rendezvousNode2 rendezvousNode3 rendezvousNode4 rendezvousNode5
+docker rm rendezvousNode0 rendezvousNode1 rendezvousNode2 rendezvousNode3 rendezvousNode4 rendezvousNode5
+docker rmi rendezvousnode0 rendezvousnode1 rendezvousnode2 rendezvousnode3 rendezvousnode4 rendezvousnode5
 
 # build a base image
 docker build -t rendezvousbase -f src/Docker/Dockerfile .
@@ -66,9 +66,15 @@ printf '%.s-' {1..100}; echo ""
 docker build -t rendezvousnode0 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50251 .
 docker build -t rendezvousnode1 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50252 .
 docker build -t rendezvousnode2 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50253 .
+docker build -t rendezvousnode3 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50254 .
+docker build -t rendezvousnode4 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50255 .
+docker build -t rendezvousnode5 -f src/Docker/Dockerfile_RenzNode --build-arg PORT=50256 .
 docker run -d -it --name rendezvousNode0 -p 50251:50251 rendezvousnode0:latest 50251 1.0
 docker run -d -it --name rendezvousNode1 -p 50252:50252 rendezvousnode1:latest 50252 1.0
 docker run -d -it --name rendezvousNode2 -p 50253:50253 rendezvousnode2:latest 50253 1.1
+docker run -d -it --name rendezvousNode3 -p 50254:50254 rendezvousnode3:latest 50254 1.0
+docker run -d -it --name rendezvousNode4 -p 50255:50255 rendezvousnode4:latest 50255 1.0
+docker run -d -it --name rendezvousNode5 -p 50256:50256 rendezvousnode5:latest 50256 1.1
 
 # starts a second router
 printf '%.s-' {1..100}

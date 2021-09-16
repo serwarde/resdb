@@ -1,7 +1,7 @@
 import argparse
 import random
 import socket
-from collections import defaultdict
+from collections import defaultdict, Counter
 from concurrent import futures
 
 import grpc
@@ -25,7 +25,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         # TODO: Locking this attribute to ensure sync
         self._dict_nodes = {}
         self.set_nodes()
-        self.replica = 1
+        self.replica = 2
 
     def set_nodes(self):
         """
@@ -170,8 +170,13 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
             ip_from_champions = self.find_responsible_node(
                 request.key, tmp_dict_items, self.replica)
 
-        if len(ip_from_champions) > len(self._dict_nodes):
-            print("ERROR: Number of requested replicas exceeds the number of available nodes")
+        # Note: This step is a make-shift solution for dealing with the client request, however, it should be sufficient for now 
+        if ip_from_champions == -1:
+            print("ERROR: Node failure was detected, your requested was not handled")
+            return grpc.StatusCode.UNAVAILABLE
+        elif len(ip_from_champions) > len(self._dict_nodes):
+            print(
+                "ERROR: Number of requested replicas exceeds the number of available nodes")
             return None
         else:
             for id, ip in enumerate(ip_from_champions):
@@ -192,7 +197,6 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
 
         if request.type != 1:
             return RH_pb2.RendezvousFindNodeResponse()
-
         else:
             return RH_pb2.RendezvousFindNodeResponse(values=response.values)
 
@@ -200,21 +204,117 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         dict = {}
 
         # TODO: threading
-        for _, n_ip in dict_nodes_items:
+        try:
+            for n_name, n_ip in dict_nodes_items:
+                # note: a node tuple consists of an ip_address and name
+                # connect to the node
+                channel = grpc.insecure_channel(n_ip)
+                node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+
+                # calc the hash score from the node
+                request_node = RN_pb2.NodeHashValueForRequest(key=key)
+                currentValue = node_stub.hash_value_for_key(request_node)
+
+                dict[n_ip] = currentValue.hashValue
+        except grpc.RpcError as e:
+            status_code = e.code()
+            if grpc.StatusCode.UNAVAILABLE == status_code:
+                self.failure_handling_distributed_processing(n_name, n_ip)
+            return -1
+        else:
+            # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.
+            # It is in order therefore is the first node the champion
+            return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
+
+    def failure_handling_distributed_processing(self, n_name, failed_node):
+        """
+        Another way or handling failure
+        """
+        print("Warning: Node Failure on ", failed_node)
+        del self._dict_nodes[n_name]
+        print(self._dict_nodes)
+
+        for _, n_ip in self._dict_nodes.copy().items():
+            channel = grpc.insecure_channel(n_ip)
+            node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
+            request = RN_pb2.NodeGetLostEntriesRequest(ip_address = failed_node)
+            node_stub.inspect_lost_entries(request)
+
+    def failure_handling(self, failed_node):
+        """
+        Gets called incase a node is not responsive
+        """
+        print("Warning: Node Failure!")
+        del self._dict_nodes[failed_node]
+
+        main_kv_pairs = []
+        replica_kv_pairs = []
+
+        for _, n_ip in self._dict_nodes.items():
             # note: a node tuple consists of an ip_address and name
             # connect to the node
             channel = grpc.insecure_channel(n_ip)
             node_stub = RN_pb2_grpc.RendezvousNodeStub(channel)
 
-            # calc the hash score from the node
-            request_node = RN_pb2.NodeHashValueForRequest(key=key)
-            currentValue = node_stub.hash_value_for_key(request_node)
+            # get list of keys from node and extend the corresponding list
+            request_node = RN_pb2.NodeEmpty()
+            responses = node_stub.get_objects(request_node)
+            main_kv_pairs.extend([v for r in responses for v in r.values])
 
-            dict[n_ip] = currentValue.hashValue
+            request_node = RN_pb2.NodeEmpty()
+            responses = node_stub.get_replicas(request_node)
+            replica_kv_pairs.extend([v for r in responses for v in r.values])
 
-        # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.
-        # It is in order therefore is the first node the champion
-        return [tmp[0] for tmp in sorted(dict.items(), key=lambda x: x[1], reverse=True)[:n_highest+1]]
+        # Note: we store in two different lists incase we find a better solution for how to redistribute keys
+        missing_main_keys = list(
+            set(main_kv_pairs).symmetric_difference(set(replica_kv_pairs)))
+        
+        #Done: This part should be functional, but we need more nodes and a higher replica limit to test it properly
+        missing_replica_keys = []
+
+        for key, value in dict(Counter(replica_kv_pairs)).items():
+            if value < self.replica:
+                missing_replica_keys.append(key)
+
+        print("Missing Primary Keys after the failure of {}:".format(failed_node))
+        print(missing_main_keys)
+        print("Missing Replica Keys after the failure of {}:".format(failed_node))
+        print(missing_replica_keys)
+
+        # TODO: This part is experimental but should be functional, please refer to the above TODO
+        #self.redistribute_missing_keys(missing_main_keys, missing_replica_keys)
+
+    def redistribute_missing_keys(self, missing_main_keys, missing_replica_keys):
+        """
+        Redistribute missing keys after node failure
+
+        missing_main_keys: list of primary keys that were saved on the failed node
+        missing_replica_keys list of replica keys that were saved on the failed node
+        """
+
+        for k in missing_main_keys:
+            # Gets the corresponding values of a missing key from one of the replicas
+            request = RN_pb2.NodeGetRequest(type=1, key=k, replica_number=-1)
+            response = self.forward_to_responsible_node(request)
+
+            # TODO: Delete all replica instances from the network before re-adding it (or find a better solution)
+
+            # Re-add the missing key to the network
+            request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key=k, values=list(response.values))
+            self.forward_to_responsible_node(request)
+
+        for k in missing_replica_keys:
+            # Gets the corresponding values of a missing key from one of the replicas
+            request = RN_pb2.NodeGetRequest(type=1, key=k, replica_number=-1)
+            response = self.forward_to_responsible_node(request)
+
+            # TODO: We probably only need to add an extra replica, but this work for now (albeit logically incorrectly)
+
+            # Re-add the missing key to the network
+            request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key=k, values=list(response.values))
+            self.forward_to_responsible_node(request)
 
 
 def serve(ip_address, port):
