@@ -16,27 +16,31 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
     def __init__(self, name='444', ip_adress='localhost', port='90001',
                  CH=ConsistentHashing([node1, node2, node3, node4])):
+        """
+        Initialize
+        """
         self._host_name = name
         self.CH = CH
         self._host_ip = ip_adress
         self._http_port = port
         self._objects_dict = defaultdict(lambda: [])
         self._objects_dict['ff'] = 'aaa'
-        # TODO: incomplete
         self._replication_dict = defaultdict(lambda: [])
         self._replication_dict['90001'] = {}
         self._replication_dict['90001']['ff'] = 'data2'
         self.replication_num = 1
 
     def hash_value_for_key(self, key):
-        # implement a hash function
+        """
+        Implement a hash function
+        """
         m = hashlib.md5()
         m.update(key.encode('utf-8'))
         return m.hexdigest()
 
     def add_object(self, key, value):
         """
-        adds a new object to the dict
+        Add a new object to the dict
         key = the key for the object
         value = value of the key
         """
@@ -46,18 +50,18 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
     def remove_object(self, key):
         """
-        removes an object from the dict,
-        if a value is given it just removes the value/s for the key
+        Remove an object from the dict,
+        if a value is given, it just removes value/s for the key
 
         key = the key for the object
-        value = optional parameter, if a specific value/s should be deleted
+        value = optional parameter, if (a) specific value/s should be deleted
         """
         if key in self._objects_dict:
             del self._objects_dict[key]
 
     def get_object(self, key) -> Union[int, str, list, bool, tuple, dict]:
         """
-        returns the values for a given key
+        Returns values for a given key
         key = the key for the object
         """
         return self._objects_dict[key]
@@ -86,6 +90,9 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
             return preferrence_list[position - self.replication_num: position]
 
     def update_coordinator(self):
+        """
+        Update the coordinator 
+        """
         for key in self._objects_dict.keys():
             preferrence_list, _ = self.CH.find_preference_list(key)
             coordinator = node2
@@ -109,6 +116,9 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
                 response = stub.get_request(request)
 
     def update_replication(self):
+        """
+        Update the replication 
+        """
         for key in self._replication_dict.keys():
             preferrence_list, _ = self.CH.find_preference_list(key)
             last_node = preferrence_list[-1]
@@ -124,7 +134,6 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
             channel = grpc.insecure_channel('local' + ":" + new_come_node._http_port)
             stub = pb2_grpc.ConsistentHashingStub(channel)
             request = pb2.GeneralRequest(key=request.key, NodeIp=request.NodeIp, NodePort=request.NodePort,
-                                         ##########################request 有问题
                                          RequestType='replicaion',
                                          ClientIp=request.ClientIp, CoordinatorIp=key)
             response = stub.get_request(request)
@@ -134,9 +143,9 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
         GRPC
 
         Node gets a request, checks the type of the request and calls the responsible function
-        type = can be (get, add, remove or update)
+
         key = the key for the item that should be stored
-        value = only necessary for add and update
+        value = only necessary for add() and update()
         """
         key = request.key
         preferrence_list, _ = self.CH.find_preference_list(key)
@@ -151,22 +160,20 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
         # if node._host_name == self._host_name:
         if request.RequestType in object_request_list:
             if request.RequestType == 'add_object':
-                # TODO incomplete
-                if self._host_name in hostname_list:  ###############################
+                if self._host_name in hostname_list:  
                     self.add_object(request.key, request.value)
                     replication = self.find_replication(preferrence_list, coordinator)
                     print(replication, '1111')
 
-                    #                     return pb2.SimpleReply(message="Successfull")####
                     for re in replication:
                         print('replication port', re._host_name, re._http_port)
-                        channel = grpc.insecure_channel('localhost' + ":" + '90001')  #################################
+                        channel = grpc.insecure_channel('localhost' + ":" + '90001')  
                         stub = pb2_grpc.ConsistentHashingStub(channel)
                         request = pb2.GeneralRequest(key=request.key, NodeIp=request.NodeIp, NodePort=request.NodePort,
                                                      RequestType='replicaion',
                                                      ClientIp=request.ClientIp, CoordinatorIp=self._http_port,
                                                      value=request.value)
-                        #                         print(request)
+                  
                         response = stub.get_request(request)
                         print(response)
                         # send_request()# send request to the node and store the replication
@@ -176,7 +183,7 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
                     stub = pb2_grpc.ConsistentHashingStub(channel)
                     request = pb2.GeneralRequest(key=request.key, NodeIp=request.NodeIp, NodePort=request.NodePort,
                                                  RequestType=request.RequestType, ClientIp=request.ClientIp,
-                                                 CoordinatorIp=self._http_port, value=request.value)  # 测试
+                                                 CoordinatorIp=self._http_port, value=request.value)  
                     response = stub.get_request(request)
                 return pb2.SimpleReply(message="Successfull")
 
@@ -213,7 +220,6 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
 
             elif request.RequestType == 'remove_object':
-                # TODO
                 for node in preferrence_list:
                     channel = grpc.insecure_channel(node._host_ip + ":" + node._http_port)
                     stub = pb2_grpc.ConsistentHashingStub(channel)
@@ -225,13 +231,11 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
             # data replicate in replication_dict
             elif request.RequestType == 'replicaion':
-                # TODO
                 self._replication_dict[request.CoordinatorIp] = {}
                 self._replication_dict[request.CoordinatorIp][request.key] = request.value
                 return pb2.SimpleReply(message="Replication Successfull")
 
-        if request.RequestType in node_request_list:  #########
-            # TODO After adding the new node,
+        if request.RequestType in node_request_list:  
             """ 1.If the node that contains the replication is still in the Preference List: 
                 redistribute, update the Preference List.
                 2.If the node that contains the replication is not in the Preference List:
@@ -249,7 +253,7 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
             elif request.RequestType == 'update coordinator':
                 self._replication_dict[request.newIp] = self._replication_dict[
-                    request.oldIp]  ######################## new old
+                    request.oldIp]  
                 del self._replication_dict[request.oldIp]
                 return pb2.SimpleReply(message="2 update coordinator Successfull")
 
@@ -262,12 +266,12 @@ class ConsistentNode(pb2_grpc.ConsistentHashingServicer):
 
 
 
-            """ 5 step to remove a node with replication
+            """ 5 step for remove a node with replication
             1.update coordinator for coresponding data that stored in node
             2.update replication node 
             3.redistribute a part of hasing ring 
             4.broadcast information that this node has been removed to any other node in consistent hash ring
-            5.removed node from hash ring
+            5.remove node from hash ring
             """
             elif request.RequestType == 'remove_node':
 
