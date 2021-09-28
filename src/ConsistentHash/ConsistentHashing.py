@@ -17,6 +17,9 @@ class ConsistentHashing():
                 self.init_ring(node)
 
     def init_ring(self, node):
+        """
+        initialize the hash ring
+        """
         for i in range(self.virtual_copies):
             virtual_node = f"{node._host_name}#{i}"
             hashcode = self.get_hash(virtual_node)
@@ -48,36 +51,39 @@ class ConsistentHashing():
             self._sorted_hashcode.remove(hashcode)
 
     def redistribute_objects_for_add(self, node):
-        """Find the corresponding key of the object, whose hashvalue is in the related range,
-           put it into the new node.
         """
-        # TODO：think about how to redistribute objects after add or delete the node
+        Find a corresponding key of the object, whose hashvalue is in the related range,
+        put it into the new node.
+        """
+       
         hashcode = self.get_hash(node._host_name + '#' + str(0))
         position = self._sorted_hashcode.index(hashcode)
 
-        if position == 0:
+        if position == 0: # The first position of hashring
             prev_neighbor_hashcode = self._sorted_hashcode[-1]
             next_neighbor_hashcode = self._sorted_hashcode[position + 1]
             next_neighbor_node = self.ring[next_neighbor_hashcode]
 
-        elif position == len(self._sorted_hashcode) - 1:
+        elif position == len(self._sorted_hashcode) - 1: # The last position of hashring
             prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
             next_neighbor_hashcode = self._sorted_hashcode[0]
             next_neighbor_node = self.ring[next_neighbor_hashcode]
-        else:
+        else: # Other
             prev_neighbor_hashcode = self._sorted_hashcode[position - 1]
             next_neighbor_hashcode = self._sorted_hashcode[position + 1]
             next_neighbor_node = self.ring[next_neighbor_hashcode]
 
         #         all_object = next_neighbor_node._objects_dict
+        # Move the object that in the specific region into the new node
         for k, v in next_neighbor_node._objects_dict.items():
             if k > prev_neighbor_hashcode and k < hashcode:
                 node.add_object(k, v)
                 next_neighbor_node.remove_object(k, v)
 
     def redistribute_objects_for_remove(self, node):
-        """Find all objects stored on the current node,
-           put them into the next node.
+        """
+        Find all objects stored on the current node,
+        put them into the next node.
         """
         hashcode = self.get_hash(node._host_name + '#' + str(0))
         position = self._sorted_hashcode.index(hashcode)
@@ -98,8 +104,8 @@ class ConsistentHashing():
 
     def find_preference_list(self, key):
         """
-        Given a key， a corresponding node in the hash ring is returned
-        along with its position in the ring.
+        Given a key， return the corresponding preference list.
+        preference list = N neighbor nodes after the responsible node.
 
         If the hash ring is empty, (`None`, `None`) is returned.
         """
