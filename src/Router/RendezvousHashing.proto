@@ -1,0 +1,28 @@
+syntax = "proto3";
+import "type.proto";
+
+service RendezvousHashing {
+    rpc forward_to_responsible_node (RendezvousFindNodeRequest) returns (RendezvousFindNodeResponse) {};
+    rpc add_node (RendezvousInformation) returns (RendezvousEmpty);
+    rpc remove_node (RendezvousInformation) returns (RendezvousEmpty);
+    rpc _add_node (RendezvousInformation) returns (RendezvousEmpty);
+    rpc _remove_node (RendezvousInformation) returns (RendezvousEmpty);
+}
+
+message RendezvousFindNodeRequest {
+    GetRequestType type = 1;
+    string key = 2;
+    repeated string values = 3;
+}
+
+message RendezvousFindNodeResponse {
+    repeated string values = 1;
+}
+
+message RendezvousInformation {
+    string name = 1;
+    string ip_address = 2;
+}
+
+message RendezvousEmpty {
+}

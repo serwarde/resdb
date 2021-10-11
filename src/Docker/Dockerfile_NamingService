@@ -1,0 +1,6 @@
+FROM rendezvousbase:latest
+ARG PORT
+COPY ./src/NamingService/start_server.sh /resdb
+WORKDIR "/resdb"
+EXPOSE $PORT
+ENTRYPOINT ["/bin/bash", "start_server.sh"]

@@ -1,0 +1,1 @@
+python -m src.Node.RendezvousNode -p $1 -w $2 

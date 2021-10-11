@@ -1,0 +1,6 @@
+FROM rendezvousbase:latest
+ARG PORT
+COPY ./src/Node/renz_start_node.sh /resdb
+WORKDIR "/resdb"
+EXPOSE $PORT
+ENTRYPOINT ["/bin/bash", "renz_start_node.sh"]

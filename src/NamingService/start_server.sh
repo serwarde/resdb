@@ -1,0 +1,1 @@
+python -m src.NamingService.NamingService -p $1

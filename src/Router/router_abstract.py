@@ -19,7 +19,7 @@ class AbstractRouterClass(metaclass=ABCMeta):
         pass
     
     @abstractmethod
-    def find_responsible_node(self, key):
+    def forward_to_responsible_node(self, key):
         """
         finds the responsible node, for a given key
         """

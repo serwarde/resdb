@@ -1,0 +1,6 @@
+FROM alpine:3.13
+COPY ./grpc /grpc
+COPY ./requirements.txt /grpc/requirements.txt
+#RUN pip install grpcio-tools
+RUN pip install -r /grpc/requirements.txt
+CMD ["/bin/bash", "/grpc/start_client.sh"]

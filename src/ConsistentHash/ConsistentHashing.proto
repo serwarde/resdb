@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+service ConsistentHashing {
+    rpc find_responsible_node (ConsistentFindNodeRequest) returns (ConsistentFindNodeReply);
+    rpc add_node (NodeInformation) returns (AddNodeReply);
+    rpc remove_node (NodeInformation) returns (RemoveNodeReply);
+    rpc send_request(ForwardingInforRequest) returns(SimpleReply);
+
+    rpc brodcast(brodcastRequest) returns(SimpleReply);
+    rpc replication(replicaitonRequest) returns(replicaitonReply);
+    rpc get_request(GeneralRequest) returns(SimpleReply);
+}
+
+message brodcastRequest{
+    string NodeIp = 1;
+    string NodePort = 2;
+    string RequestType = 3;
+    int32 Count = 4;
+}
+
+message replicaitonRequest{
+
+}
+
+message replicaitonReply{
+
+}
+
+
+
+
+message brodcastReply{
+    string NodeIp = 1;
+
+}
+
+message ConsistentFindNodeRequest {
+    string key = 1;
+    string RequestType = 2;
+}
+message ConsistentFindNodeReply {
+    string reply = 1;
+}
+
+message NodeInformation {
+    string name = 1;
+    string ip_address = 2;
+}
+
+message GeneralRequest{
+    string key = 1;
+    string NodeIp = 2;
+    string NodePort = 3;
+    string ClientIp = 4;
+    string RequestType =5;
+    string CoordinatorIp =6;
+    string value =7;
+    optional string newIp= 8;
+    optional string oldIp= 9;
+    optional string removedNode=10;
+
+}
+
+message RemoveRequest{
+    string key = 1;
+    string newIp= 2;
+    string oldIp= 3;
+    string RequestType = 4;
+}
+
+
+
+message ForwardingInforRequest {
+    string key = 1;
+    string NodeIp = 2;
+    string NodePort = 3;
+    string ClientIp = 4;
+    string RequestType =5;
+}
+
+message SimpleReply {
+    string message = 1;
+}
+
+message GeneralReplay{
+    string key = 1;
+    string NodeIp = 2;
+    string ClientIp = 4;
+    string RequestType = 3;
+
+}
+
+
+
+
+message Empty {
+}
+
+
+message AddNodeReply {
+    string reply = 1;
+}
+
+
+message RemoveNodeReply {
+    string reply = 1;
+}
