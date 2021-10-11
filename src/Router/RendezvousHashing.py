@@ -219,7 +219,7 @@ class RendezvousHashing(AbstractRouterClass, RH_pb2_grpc.RendezvousHashingServic
         except grpc.RpcError as e:
             status_code = e.code()
             if grpc.StatusCode.UNAVAILABLE == status_code:
-                self.failure_handling_distributed_processing(n_name, n_ip)
+                self.failure_handling(n_name)
             return -1
         else:
             # sorts the dict based on the hashValue and then returns the ip of the highest hashvalues.

@@ -110,26 +110,29 @@ if __name__ == '__main__':
 
     input("Stop one of the Node docker containers then press Enter to continue...")
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="bob2", values=["111"])
-    router_stub.forward_to_responsible_node(request)
+    try:
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="bob2", values=["111"])
+        router_stub.forward_to_responsible_node(request)
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="Michelle", values=["222"])
-    router_stub.forward_to_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="Michelle", values=["222"])
+        router_stub.forward_to_responsible_node(request)
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="Tammy", values=["333"])
-    router_stub.forward_to_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="Tammy", values=["333"])
+        router_stub.forward_to_responsible_node(request)
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="Mark", values=["444"])
-    router_stub.forward_to_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="Mark", values=["444"])
+        router_stub.forward_to_responsible_node(request)
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="Brad", values=["555"])
-    router_stub.forward_to_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="Brad", values=["555"])
+        router_stub.forward_to_responsible_node(request)
 
-    request = RH_pb2.RendezvousFindNodeRequest(
-            type=type_pb2.ADD, key="Cassie", values=["666"])
-    router_stub.forward_to_responsible_node(request)
+        request = RH_pb2.RendezvousFindNodeRequest(
+                type=type_pb2.ADD, key="Cassie", values=["666"])
+        router_stub.forward_to_responsible_node(request)
+    except grpc.RpcError as e:
+        print("Server unavialable, request was not handled.")

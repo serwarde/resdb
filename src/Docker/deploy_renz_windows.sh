@@ -27,12 +27,12 @@ docker rmi namingservice
 printf '%.s-' {1..100}
 printf " deletes Router Server "
 printf '%.s-' {1..100}; echo ""
-docker stop rendezvousHashing0
-docker rm rendezvousHashing0
-docker rmi rendezvoushashing0
-docker stop rendezvousHashing1
-docker rm rendezvousHashing1
-docker rmi rendezvoushashing1
+docker stop rendezvousRouter0
+docker rm rendezvousRouter0
+docker rmi rendezvousrouter0
+# docker stop rendezvousHashing1
+# docker rm rendezvousHashing1
+# docker rmi rendezvoushashing1
 
 # deletes a nodes
 printf '%.s-' {1..100}
@@ -56,8 +56,8 @@ docker run -d -it --name namingService -p 50050:50050 namingservice:latest 50050
 printf '%.s-' {1..100}
 printf " creates and starts Router Server "
 printf '%.s-' {1..100}; echo ""
-docker build -t rendezvoushashing0 -f src/Docker/Dockerfile_RenzRouter --build-arg PORT=50151 .
-docker run -d -it --name rendezvousHashing0 -p 50151:50151 rendezvoushashing0:latest 50151
+docker build -t rendezvousrouter0 -f src/Docker/Dockerfile_RenzRouter --build-arg PORT=50151 .
+docker run -d -it --name rendezvousRouter0 -p 50151:50151 rendezvousrouter0:latest 50151
 
 # starts a node
 printf '%.s-' {1..100}
@@ -77,11 +77,11 @@ docker run -d -it --name rendezvousNode4 -p 50255:50255 rendezvousnode4:latest 5
 docker run -d -it --name rendezvousNode5 -p 50256:50256 rendezvousnode5:latest 50256 1.1
 
 # starts a second router
-printf '%.s-' {1..100}
-printf " creates and starts a second Router Server "
-printf '%.s-' {1..100}; echo ""
-docker build -t rendezvoushashing1 -f src/Docker/Dockerfile_RenzRouter --build-arg PORT=50152 .
-docker run -d -it --name rendezvousHashing1 -p 50152:50152 rendezvoushashing1:latest 50152
+# printf '%.s-' {1..100}
+# printf " creates and starts a second Router Server "
+# printf '%.s-' {1..100}; echo ""
+# docker build -t rendezvoushashing1 -f src/Docker/Dockerfile_RenzRouter --build-arg PORT=50152 .
+# docker run -d -it --name rendezvousHashing1 -p 50152:50152 rendezvoushashing1:latest 50152
 
 printf '%.s-' {1..100}
 printf " done "
